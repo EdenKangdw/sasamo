@@ -7,12 +7,27 @@ var connection = mysql_dbc.init();
 mysql_dbc.test_open(connection);
 
 router.get('/', function (req, res, next) {
+  console.log('work');
   res.sendFile(path.join(__dirname, '../public', 'index.html'))
+  console.log("1e232323");
+});
+// __dirname = 디렉토리의 절대경로
+
+router.get('/member', function(req, res) {
+  console.log("logn");
+ const query = 'select * from ssm_member';
+ connection.query(query, function(err, result) {
+   console.log(result);
+   res.send(result)
+ })
 });
 
 router.get('/mysql/test', function (req, res) {
-  var stmt = 'select *from ....';
+  var stmt = 'select * from ssm_member';
   connection.query(stmt, function (err, result) {
+    if(err) throw err;
+    console.log('RESULT : ', result)
+    res.send(result);
     
   })
 });

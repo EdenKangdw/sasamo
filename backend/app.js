@@ -6,9 +6,12 @@ var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
+var moviesRouter = require('./routes/movies');
+var sasamoRouter = require('./routes/sasamo');
+
 
 var app = express();
-app.use(require("connect-history-api-fallback")());
+app.use(require('connect-history-api-fallback')());
 
 
 
@@ -24,8 +27,12 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 
-app.use('/', indexRouter);
+app.use('/api/db', indexRouter);
 app.use('/users', usersRouter);
+app.use('/api/movies', moviesRouter);
+app.use('/api/sasamo', sasamoRouter);
+
+// app.use('url', file) url로 접근할 때, file을 사용한다.
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

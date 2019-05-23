@@ -33,18 +33,13 @@ export default {
   },
   data () {
     return {
-      user: []
+      user: {}
     }
   },
   methods: {
       login() {
-      this.$http.post('/api/sasamo/login', {
-        id: this.ssm_id,
-        pw: this.ssm_pw
-      })
-
       this.$router.push({ name: 'sasamo_show', params: { id: this.ssm_id, pw: this.ssm_pw }})
-      console.log(this.ssm_id)
+      console.log('login:', this.ssm_id)
     }
   }
 

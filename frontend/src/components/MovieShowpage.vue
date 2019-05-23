@@ -14,7 +14,7 @@ export default {
       this.movie = response.data
     })
   },
-  data: function () {
+  data () {
     return {
       movie: {}
     }

@@ -1,21 +1,29 @@
 <template lang="html">
-
-<h1>로그인 페이지입니다.</h1>
-<p>{{ this.$route.params.id }}
-{{ id }}</p>
+<div>
+  <h1>로그인 페이지입니다.</h1>
+  <h1>데이터 {{user}} 나와라</h1>
+</div>
 
 </template>
 
 <script>
 export default {
-  created: function () {
-    var id = this.$route.params.id
-    console.log(id, "askjdlskj")
-    this.id = id
+  created () {
+    var ssm_id = this.$route.params.id
+    var ssm_pw = this.$route.params.pw
+    this.$http.post('/api/sasamo/login', {
+        id: ssm_id,
+        pw: ssm_pw
+      }).then((res) => {
+        this.user = res.data
+        console.log('show:', res.data.id)
+        console.log('data:', this.user.id, typeof this.user)
+
+      })
   },
-  data: function () {
+  data () {
     return {
-      id : this.$route.params.id
+      user: {}
     }
   }
 }

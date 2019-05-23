@@ -9,7 +9,8 @@ var connection = mysql_dbc.init();
 
 function loginModel(userVal) {
     return {
-        log: userVal.ssm_id,
+        id: userVal.ssm_id,
+        pw: userVal.ssm_pw,
         ok: true
     };
 }
@@ -46,7 +47,9 @@ router.post('/login', function(req, res) {
         console.log(typeof result, result.length, result)
         if(id === result[0].ssm_id && pw === result[0].ssm_pw){
             var user = loginModel(result[0])
+            console.log('success', user)
             res.send(user)
+
         } else {
             console.log('4')
         }   

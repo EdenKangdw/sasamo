@@ -1,6 +1,8 @@
 <template lang="html">
 
 <h1>로그인 페이지입니다.</h1>
+<p>{{ this.$route.params.id }}
+{{ id }}</p>
 
 </template>
 
@@ -8,14 +10,12 @@
 export default {
   created: function () {
     var id = this.$route.params.id
-    this.$http.get(`/api/movies/${id}`)
-    .then((response) => {
-      this.movie = response.data
-    })
+    console.log(id, "askjdlskj")
+    this.id = id
   },
   data: function () {
     return {
-      movie: {}
+      id : this.$route.params.id
     }
   }
 }

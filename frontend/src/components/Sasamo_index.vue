@@ -1,7 +1,7 @@
 <template lang="html">
 <div id="app">
-    <h1>로그인을 해주세요</h1>
-    <form id="loginForm" @submit.prevent='login'>
+    <h1>로그인을 해주세요 {{log}}</h1>
+    <form id="loginForm" @submit.prevent='login' action="/login">
         <table id="login">
             <tr>
                 <td>ID</td>
@@ -13,7 +13,7 @@
             </tr>
             <tr>
                 <td colspan="2">
-                    <input type="button" value="login">
+                    <input type="submit" value="login">
                     <input type="button" value="회원가입">
                 </td>
             </tr>
@@ -33,8 +33,20 @@ export default {
   },
   data () {
     return {
-      movies: []
+      user: []
+    }
+  },
+  methods: {
+      login() {
+      this.$http.post('/api/sasamo/login', {
+        id: this.ssm_id,
+        pw: this.ssm_pw
+      })
+
+      this.$router.push({ name: 'sasamo_show', params: { id: this.ssm_id, pw: this.ssm_pw }})
+      console.log(this.ssm_id)
     }
   }
+
 }
 </script>

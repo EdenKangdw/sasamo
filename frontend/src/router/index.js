@@ -5,7 +5,8 @@ import LoginPage from '@/components/LoginPage'
 import MovieIndexPage from '@/components/MovieIndexPage'
 import MovieShowPage from '@/components/MovieShowPage'
 import sasamo from '@/components/Sasamo_index'
-import sasamo_show from '@/components/Sasamo_show'
+import sasamo_main from '@/components/Sasamo_main'
+import sasamo_signup from '@/components/Sasamo_signup'
 
 
 
@@ -40,9 +41,14 @@ export default new Router({
       component: sasamo
     },
     {
-      path: '/sasamo/:id',
-      name: 'sasamo_show',
-      component: sasamo_show
+      path: '/sasamo/main',
+      name: 'sasamo_main',
+      component: sasamo_main
+    },
+    {
+      path: '/sasamo/signup',
+      name: 'sasamo_signup',
+      component: sasamo_signup
     }
   ]
 })

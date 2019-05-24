@@ -15,7 +15,7 @@
 
 <script>
 export default {
-  created () {
+  created () { 
     var ssm_id = this.$route.params.id
     var ssm_pw = this.$route.params.pw
     this.$http.post('/api/sasamo/login', {

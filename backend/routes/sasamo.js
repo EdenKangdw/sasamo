@@ -45,26 +45,17 @@ router.post('/login', function(req, res) {
     } else {
         console.log('2')
         console.log(typeof result, result.length, result)
-        console.log(result[0])
-        if(result[0]){
-            if(id === result[0].ssm_id && pw === result[0].ssm_pw){
-                var user = loginModel(result[0], true)
-                console.log('success', user)
-                res.send(user)
-    
-            } else {
-                console('else')
-                var user = loginModel(true, false)
-                res.redirect('/')
-                // res.send(user)
-                console.log('fail', user)
-            }
-            
-        }else {
+        if(id === result[0].ssm_id && pw === result[0].ssm_pw){
+            var user = loginModel(result[0], true)
+            console.log('success', user)
+            res.send(user)
+
+        } else {
             var user = loginModel(true, false)
             res.send(user)
-        }
-           
+            console.log('fail', user)
+
+        }   
     }
       
     })

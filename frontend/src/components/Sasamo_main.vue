@@ -6,16 +6,13 @@
   <input type="button" :value="main_btn">
   <input type="button" :value="user.id">
 
-  <div>
-    
-
 </div>
 
 </template>
 
 <script>
 export default {
-  created () {
+  created () { 
     var ssm_id = this.$route.params.id
     var ssm_pw = this.$route.params.pw
     this.$http.post('/api/sasamo/login', {

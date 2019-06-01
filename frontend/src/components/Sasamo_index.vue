@@ -1,6 +1,6 @@
 <template lang="html">
 <div id="app">
-    <h1>로그인을 해주세요 {{log}}</h1>
+    <h1> {{ log }} </h1>
     <form id="loginForm" @submit.prevent='login' action="/login">
         <table id="login">
             <tr>
@@ -14,7 +14,7 @@
             <tr>
                 <td colspan="2">
                     <input type="submit" value="login">
-                    <input type="button" value="회원가입">
+                    <input type="button" value="회원가입" v-on:click="signup"> 
                 </td>
             </tr>
         </table>
@@ -26,21 +26,34 @@
 <script>
 export default {
   created () {
-    this.$http.get('api/db/mysql/test')
-    .then((response) => {
-      this.movies = response.data
-    })
+    
   },
   data () {
     return {
-      user: {}
+      user: {},
+      log: "로그인을 해주세요"
     }
   },
   methods: {
       login() {
-      this.$router.push({ name: 'sasamo_show', params: { id: this.ssm_id, pw: this.ssm_pw }})
-      console.log('login:', this.ssm_id)
-    }
+            this.$http.post('/api/sasamo/login', {
+                id: this.ssm_id,
+                pw: this.ssm_pw
+            }).then((res) => {
+                this.user = res.data
+                    if(res.data.ok === true){
+                        this.$router.push({ name: 'sasamo_main', params: { id: this.ssm_id, pw: this.ssm_pw }})
+                        console.log('login:', this.ssm_id)
+                    }else{
+                        this.log = "올바르지 않은 아이디/패스워드 입니다"
+                    }
+        })
+      },
+        signup() {
+            this.$router.push({ name: 'sasamo_signup' })
+            console.log('signUP')
+        }
+
   }
 
 }

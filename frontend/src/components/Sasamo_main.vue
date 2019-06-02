@@ -1,9 +1,9 @@
 <template lang="html">
 <div>
-  <h1>로그인 페이지입니다.</h1>
-  <h1>{{ user.id }}님 환영합니다</h1>
+  <h1>{{ user.name }}님 환영합니다</h1>
+  <h1>{{user.group}}팀 입니다</h1>
 
-  <input type="button" :value="main_btn">
+  <input type="button" :value="main_btn" v-on:click="count">
   <input type="button" :value="user.id">
 
 </div>
@@ -35,6 +35,16 @@ export default {
       user: {},
       main_btn: ""
     }
+  },
+  method: {
+    count() {
+      this.$http.post('/count')
+      .then((res) => {
+        alert('출석체크 완료!')
+      }) 
+        
+
   }
+}
 }
 </script>

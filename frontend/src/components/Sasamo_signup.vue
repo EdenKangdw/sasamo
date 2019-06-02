@@ -25,6 +25,10 @@
         <td><input type="text" v-model="ssm_phone"></td>
     </tr>
     <tr>
+        <td>팀 번호</td>
+        <td><input type="text" v-model="ssm_team"></td>
+    </tr>
+    <tr>
         <td>담당사역 확인( {{ checkedDuty }} )</td>
         <td>
             <label for="intern">수습사역자</label>
@@ -63,10 +67,12 @@ export default {
           ssm_id : this.ssm_id,
           ssm_pw : this.ssm_pw,
           ssm_phone: this.ssm_phone,
+          ssm_team : this.ssm_team,
           ssm_isItrn : this.ssm_isItrn ? "Y" : "N",
           ssm_isHeal : this.ssm_isHeal ? "Y" : "N",
           ssm_isPrpt : this.ssm_isPrpt ? "Y" : "N",
           ssm_isPstr : this.ssm_isPstr ? "Y" : "N"
+
         })
       this.$router.push({ name: 'sasamo'})
       console.log('goMain')

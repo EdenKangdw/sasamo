@@ -34,12 +34,13 @@
 <script>
 export default {
   created () {
+      
     
   },
   data () {
     return {
-      user: {},
-      log: "로그인을 해주세요"
+      token: "",
+      log: this.$store.state.count
     }
   },
   methods: {
@@ -48,11 +49,13 @@ export default {
                 id: this.ssm_id,
                 pw: this.ssm_pw
             }).then((res) => {
-                this.user = res.data
-                    if(res.data.ok === true){
-                        this.$router.push({ name: 'sasamo_main', params: { id: this.ssm_id, pw: this.ssm_pw }})
-                        console.log('login:', this.ssm_id)
+                this.token = res.data
+                console.log("TOKEN :", res.data)
+                    if(res.data){
+                        this.$store.commit("updateToken", res.data)
+                        this.$router.push({ name: 'sasamo_main' })
                     }else{
+                        console.log("kashfdkasdkfl")
                         this.log = "올바르지 않은 아이디/패스워드 입니다"
                     }
         })

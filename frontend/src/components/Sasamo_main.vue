@@ -2,7 +2,7 @@
 <div>
   <h1>{{ user.ssm_name }}님 환영합니다</h1>
   <h1>{{ user.ssm_group }}팀 입니다</h1>
-
+  <h1>{{log}}</h1>
   <input type="button" :value="btn_apply" @click="btnApply">
   <input type="button" :value="btn_check" @click="btnCheck">
   <input type="button" :value="btn_team" @click="go">
@@ -14,52 +14,35 @@
 <script>
 export default {
   created () { 
-    var ssm_id = this.$route.params.id
-    var ssm_pw = this.$route.params.pw
-    this.$http.post('/api/sasamo/login', {
+    let token = localStorage.getItem('access_token')
+    console.log("LocalToken", token)
+    let config = {
+      headers : {
+        "access-token" : token
+      }
+    }
+    this.$http.get('/api/sasamo/getUserInfo', config)
       // 로그인 api 요청 
-        id: ssm_id,
-        pw: ssm_pw
-      }).then((res) => {
+      .then((res) => {
+        console.log('RESULT : ', res.data)
+        // 로그인이 완료되면 오늘 이벤트에 사역신청 했는지 확인 
         this.user = res.data
-         console.log('user 1',this.user)
+        console.log('마지막 유저', this.user)
 
-        this.$http.post('/api/sasamo/today', {
-          // 로그인이 완료되면 오늘 이벤트에 사역신청 했는지 확인 
-          user : this.user
-        }).then((res) => {
-          this.today = res.data.data
-          console.log('today',this.today)
-          console.log('마지막 유저', this.user)
-        })
-
-        if(res.data.ok){
+        if(this.user.ok){
+          console.log("SADFASDFDSAF", this.user.isToday)
           // 로그인 성공 
-          if(res.data.leader == 'y'){
+          if(this.user.leader == 'y'){
             // 팀장인 경우 
-            this.loginLeader(res.data.isToday)
+            this.loginLeader(this.user.isToday)
             console.log('a',this.btn_apply)
         } else {
           // 일반 사역자의 경우 
-            this.loginNormal(res.data.isToday)
+            this.loginNormal(this.user.isToday)
             console.log('b',this.btn_apply)
         }
-          
-          
-        }
-
-        this.$http.post('/api/sasamo/today', {
-          user : this.user
-        }).then((res) => {
-          this.today = res.data.data
-          console.log('today',this.today)
-          console.log('마지막 유저', this.user)
-        })
-        
-        console.log('show:', res.data.id)
-        console.log('data:', this.user.id, typeof this.user)
-
-      })
+      }
+    })
   },
   data () {
     return {
@@ -67,7 +50,8 @@ export default {
       today: {},
       btn_apply: "",
       btn_check: "",
-      btn_team: ""
+      btn_team: "",
+      log: this.$store.state.user
     }
   },
   methods: {

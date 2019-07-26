@@ -5,7 +5,6 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
 var moviesRouter = require('./routes/movies');
 var sasamoRouter = require('./routes/sasamo');
 
@@ -28,7 +27,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 
 app.use('/api/db', indexRouter);
-app.use('/users', usersRouter);
 app.use('/api/movies', moviesRouter);
 app.use('/api/sasamo', sasamoRouter);
 

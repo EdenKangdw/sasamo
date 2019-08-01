@@ -3,10 +3,10 @@
   <h1>{{ user.ssm_name }}님 환영합니다</h1>
   <h1>{{ user.ssm_group }}팀 입니다</h1>
   <h1>{{log}}</h1>
-  <input type="button" :value="btn_apply" @click="btnApply">
-  <input type="button" :value="btn_check" @click="btnCheck">
-  <input type="button" :value="btn_team" @click="go">
-
+  <input type="button" :value="btn_apply ? '사역신청 취소' : '사역신청'" @click="btnApply">
+  <input type="button" :value="btn_check ? '출석취소' : '출석체크'" @click="btnCheck">
+  <input type="button" :value="btn_team ? '팀 배정하기' : '팀 확인하기'" @click="go">
+  
 </div>
 
 </template>
@@ -14,6 +14,7 @@
 <script>
 export default {
   created () { 
+    // 로컬스토리지에 저장된 토큰 가져오기 : 새로고침해도 로그인 풀리지 않음
     let token = localStorage.getItem('access_token')
     console.log("LocalToken", token)
     let config = {
@@ -21,24 +22,24 @@ export default {
         "access-token" : token
       }
     }
+
+    // 유저정보 api 요청 : 오늘에 대해 출석체크를 했는지 값도 리턴됨
     this.$http.get('/api/sasamo/getUserInfo', config)
-      // 로그인 api 요청 
       .then((res) => {
         console.log('RESULT : ', res.data)
         // 로그인이 완료되면 오늘 이벤트에 사역신청 했는지 확인 
         this.user = res.data
-        console.log('마지막 유저', this.user)
-
+        console.log('유저', this.user)
         if(this.user.ok){
-          console.log("SADFASDFDSAF", this.user.isToday)
+          console.log("isToday? :", this.user.isTodayApply)
           // 로그인 성공 
-          if(this.user.leader == 'y'){
+          if(this.user.leader != null){
             // 팀장인 경우 
-            this.loginLeader(this.user.isToday)
+            this.loginLeader(this.user.isTodayApply)
             console.log('a',this.btn_apply)
         } else {
           // 일반 사역자의 경우 
-            this.loginNormal(this.user.isToday)
+            this.loginNormal(this.user.isTodayApply)
             console.log('b',this.btn_apply)
         }
       }
@@ -51,19 +52,19 @@ export default {
       btn_apply: "",
       btn_check: "",
       btn_team: "",
-      log: this.$store.state.user
+      log: this.$store.state.log
     }
   },
   methods: {
+
     
+
     btnCheck() {
       console.log("SSSSSSS")
       switch(this.btn_check){
         case '출석체크' : 
-          console.log('sdflkjsadlkfjlksjdf')
           console.log('user', this.user)
           this.check()
-          this.today.today = 'y'
           break
         case '출석취소' : 
           this.cancel()
@@ -71,21 +72,21 @@ export default {
         default :
           alert("sadfsdfdsf")
       }
-      
     },
+
     btnApply() {
       console.log("SSSSSSS", this.btn_apply)
       switch(this.btn_apply){
-        case '사역신청' : 
+        case false : 
           console.log('sdflkjsadlkfjlksjdf')
           console.log('user', this.user)
           this.check()
-          this.today.today = 'y'
-          this.btn_apply = "사역신청 취소"
+          this.btn_apply = true
+          console.log(this.btn_apply)
           break
-        case '사역신청 취소' : 
+        case true : 
           this.cancel()
-          this.btn_apply = "사역신청"
+          this.btn_apply = false
           break
         default :
           alert("sadfsads;lfjasdflasjdlfjsdfldfdsf")
@@ -93,61 +94,64 @@ export default {
       
     },
 
-    loginLeader(isToday){
-      switch (isToday) {
-              // 팀장 이면서 사역신청  
+    loginLeader(isTodayApply){
+      switch (isTodayApply) {
+              // 팀장 이면서 사역신청해야함 
               case 'n' : 
-              this.btn_apply = "사역신청"
-              this.btn_check = "출석체크"
-              this.btn_team = '팀 배정하기'
+              this.btn_apply = false
+              this.btn_check = false
+              this.btn_team = true
               break
 
+              // 이미 신청함
               case 'y' :
-              this.btn_apply = "사역신청 취소"
-              this.btn_check = "출석체크"
-              this.btn_team = '팀 배정하기'
+              this.btn_apply = true
+              this.btn_check = false
+              this.btn_team = true
               break
             }
     },
-    loginNormal(isToday){
-      switch (isToday) {
-              // 일반 이면서 사역신청  
+    loginNormal(isTodayApply){
+      switch (isTodayApply) {
+              // 일반 이면서 사역신청 해야함
               case 'n' : 
-              this.btn_apply = "사역신청",
-              this.btn_check = "출석체크"
-              this.btn_team = "우리팀 확인"
+              this.btn_apply = false,
+              this.btn_check = false
+              this.btn_team = false
               break
 
+              // 신청함 
               case 'y' :
-              this.btn_apply = "사역신청 취소",
-              this.btn_check = "출석체크"
-              this.btn_team = "우리팀 확인"
+              this.btn_apply = true,
+              this.btn_check = false
+              this.btn_team = false
               break
             }
     },
 
     check() {
-      this.$http.post('/api/sasamo/check', {
-        ssm_seq : this.today.ssm_seq,
-        ssm_name : this.today.ssm_name,
-        evt_seq : this.today.evt_seq,
-        evt_name : this.today.evt_name,
-        check : this.today.today
 
-      })
+      let token = localStorage.getItem('access_token')
+      console.log("LocalToken", token)
+    
+    
+    this.$http.post('/api/sasamo/check',  {
+      ssm_seq: this.user.ssm_seq,
+      ssm_name: this.user.ssm_name
+    }, { headers: { 'access-token': token },  
+    })
       .then((res) => {
-        console.log('show', this.today)
+        console.log('show', res)
         alert('출석체크 완료!')
       }) 
   },
     cancel(){
-      this.$http.post('/api/sasamo/cancelCheck', {
-        ssm_seq: this.today.ssm_seq,
-        evt_seq: this.today.evt_seq,
-        check: this.today.today
-      }).then((res) => {
+      let token = localStorage.getItem('access_token')
+      console.log("LocalToken", token)
+
+      this.$http.post('/api/sasamo/cancelCheck', { headers: { 'access-token': token } })
+       .then((res) => {
         console.log('사역신청 취소 완료')
-        this.btn_apply = '사역신청'
         alert('사역신청 취소 완료!')
       })
     }

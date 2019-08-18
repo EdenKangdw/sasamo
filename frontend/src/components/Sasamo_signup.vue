@@ -3,7 +3,7 @@
   <h1>회원가입 페이지입니다.</h1>
   <h1>담당사역 확인( {{ checkedDuty }} )</h1>
   <form id="signupForm" @submit.prevent='goSignup'>
-  <table border="1px soild black">
+  <table border="1px soild black" style="margin-left: auto; margin-right: auto;">
     <tr>
         <td>이름</td>
         <td><input type="text" v-model="ssm_name"></td>
@@ -41,10 +41,9 @@
             <input type="checkbox" id="pastor" value="M" v-model="ssm_isPstr">
         </td>
     </tr>
-    <tr>  
-      <td colspan="2"><input type="submit" value="회원가입"></td> 
-    </tr>
-    </table>
+</table>
+      <input type="button" value="뒤로" @click="goBack">
+      <input type="submit" value="회원가입">
     </form>
     </div>
 </template>
@@ -76,6 +75,9 @@ export default {
         })
       this.$router.push({ name: 'sasamo'})
       console.log('goMain')
+    },
+    goBack() {
+      this.$router.push({ name: 'sasamo'})
     }
   }
 

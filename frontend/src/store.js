@@ -7,12 +7,9 @@ export const store = new Vuex.Store({
   state: {
     count: "안녕하세요. 사사모사역자님",
     token: "",
-    log : "sadkhfksdjfkl22222222jf"
+    log : "HELLO",
   },
   mutations: {
-    decrement (state) {
-      state.count--
-    },
     updateToken(state, payload) {
       state.token = payload
       localStorage.setItem("access_token", payload)

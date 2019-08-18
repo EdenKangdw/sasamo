@@ -3,9 +3,10 @@
   <h1>{{ user.ssm_name }}님 환영합니다</h1>
   <h1>{{ user.ssm_group }}팀 입니다</h1>
   <h1>{{log}}</h1>
+  <input type="button" value="뒤로" @click="goBack">
   <input type="button" :value="btn_apply ? '사역신청 취소' : '사역신청'" @click="btnApply">
   <input type="button" :value="btn_check ? '출석취소' : '출석체크'" @click="btnCheck">
-  <input type="button" :value="btn_team ? '팀 배정하기' : '팀 확인하기'" @click="go">
+  <input type="button" :value="btn_team ? '팀 배정하기' : '팀 확인하기'" @click="myTeam">
   
 </div>
 
@@ -49,9 +50,9 @@ export default {
     return {
       user: {},
       today: {},
-      btn_apply: "",
-      btn_check: "",
-      btn_team: "",
+      btn_apply: false,
+      btn_check: false,
+      btn_team: false,
       log: this.$store.state.log
     }
   },
@@ -82,7 +83,7 @@ export default {
           console.log('user', this.user)
           this.check()
           this.btn_apply = true
-          console.log(this.btn_apply)
+          console.log('출석은했나?',this.btn_apply)
           break
         case true : 
           this.cancel()
@@ -130,7 +131,6 @@ export default {
     },
 
     check() {
-
       let token = localStorage.getItem('access_token')
       console.log("LocalToken", token)
     
@@ -149,12 +149,21 @@ export default {
       let token = localStorage.getItem('access_token')
       console.log("LocalToken", token)
 
-      this.$http.post('/api/sasamo/cancelCheck', { headers: { 'access-token': token } })
+      this.$http.post('/api/sasamo/cancelCheck', {
+        token: token
+      })
        .then((res) => {
         console.log('사역신청 취소 완료')
         alert('사역신청 취소 완료!')
       })
+    },
+    myTeam() {
+      this.$router.push({ name: 'sasamo_myteam' })
+    },
+    goBack() {
+      this.$router.push({ name: 'sasamo'})
     }
+
     
 },
 watch: {

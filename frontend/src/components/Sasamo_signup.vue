@@ -10,7 +10,10 @@
     </tr>
     <tr>
         <td>아이디</td>
-        <td><input type="text" v-model="ssm_id"><input type="button" value="아이디 중복체크" onclick="id_check()"></td>
+        <td><input type="text" v-model="ssm_id">
+        <input type="button" value="아이디 중복체크" @click="checkId">
+        <input type="hidden" :value="idIsChecked">
+        </td>
     </tr>
     <tr>
         <td>비밀번호</td>
@@ -55,7 +58,9 @@ export default {
   },
   data () {
     return {
-      checkedDuty: []
+      checkedDuty: [],
+      idIsChecked: "n",
+      idLog: "아이디를 입력해주세요"
     }
   },
   methods: {
@@ -75,6 +80,15 @@ export default {
         })
       this.$router.push({ name: 'sasamo'})
       console.log('goMain')
+    },
+    checkId(){
+        this.$http.post('api/sasamo/checkId', {
+            id : this.ssm_id
+        }).then(res => {
+            this.idIsChecked = 'y'
+            this.idLog = "사용가능한 아이디입니다"
+        })
+
     },
     goBack() {
       this.$router.push({ name: 'sasamo'})

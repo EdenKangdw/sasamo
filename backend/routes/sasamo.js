@@ -16,17 +16,22 @@ function resModel() {
     }
 }
 
-function userModel(userVal, today, Boolean) {
-    return {
+function userModel(userVal, checkStatus, Boolean) {
+    return new Promise((resolve, reject) => {
+    let data = {
         id: userVal.ssm_id ? userVal.ssm_id : "fail",
         pw: userVal.ssm_pw ? userVal.ssm_pw : "fail",
         ssm_seq: userVal.ssm_seq ? userVal.ssm_seq : "fail",
         ssm_group: userVal.ssm_group ? userVal.ssm_group : 'none',
         ssm_name: userVal.ssm_name ? userVal.ssm_name : 'none',
-        isTodayApply: today,
+        isTodayApply: checkStatus.chk_isApply ? checkStatus.chk_isApply : 'none',
+        istodayCheck: checkStatus.chk_isCheck ? checkStatus.chk_isCheck : 'none',
         leader: userVal.ssm_tmldr ? userVal.ssm_tmldr : "n",
         ok: Boolean ? Boolean : false
     };
+    resolve(data)
+    
+}) 
 }
 
 function checkModel(userVal, eventVal) {
@@ -45,6 +50,8 @@ function checkModel(userVal, eventVal) {
 
 
 
+
+
 function teamModel(count, group) {
     return {
         team: count % group ? count % group : 0
@@ -52,20 +59,26 @@ function teamModel(count, group) {
 }
 
 // 회원의 상태값 가져오는 함수 
-function statusModel(userSeq, eventSeq) {
-    var query = `select from ssm_check where ssm_seq=${userSeq} and evt_seq=${eventSeq}`
-    connection.query(query, function (err, result) {
-        if (err) {
-            console.log('statusModel Error: ', err)
-            throw err
-        } else {
-            return result[0]
-        }
-    })
+function statusModel(todayModel) {
+    var query = `select * from ssm_check where ssm_seq=${todayModel.ssm_seq} and evt_seq=${todayModel.evt_seq}`
+    return new Promise((resolve, reject) => {
+       connection.query(query, function (err, result) {
+            if (err) {
+                console.log('statusModel Error: ', err)
+                reject(err)
+                throw err
+            } else {
+                let data = result[0]
+                console.log('Status :', data)
+                resolve(data)
+            }
+        })
+    }) 
 }
 
 
 // router
+// 토큰값을 userModel로 변경하여 처리하기 
 
 // 로그인해서 token 받기 
 router.post('/login', function (req, res) {
@@ -109,18 +122,30 @@ router.get('/getUserInfo', (req, res) => {
         // 토큰이 있을경우 접속허가 
         getEventToday(decoded)
             .then(function (todayModel) {
-                console.log('this is today:', todayModel)
-                if (todayModel.today != 'n') {
-                    // 사역 신청을 한 경우
-                    const user = userModel(decoded.data, "y", true)
-                    console.log('success, today : Ok ', user)
-                    res.send(user)
-                } else {
-                    // 사역신청을 안한 경우
-                    var user = userModel(decoded.data, "n", true)
-                    console.log('success, today : NO ', user)
-                    res.send(user)
-                }
+                console.log('dddddddd',todayModel)
+                statusModel(todayModel)
+                .then((checkStatus) => {
+
+                    console.log('this is status:', checkStatus)
+                    if (checkStatus.chk_isApply != 'n') {
+                        // 사역 신청을 한 경우
+                        userModel(decoded.data, checkStatus, true)
+                        .then((user) => {
+                            console.log('success, today : Ok ', user)
+                            res.send(user)
+                        })
+                    } else {
+                        // 사역신청을 안한 경우
+                        userModel(decoded.data, checkStatus, true)
+                        .then((user) => {
+                            console.log('success, today : NO ', user)
+                            res.send(user)
+                        })
+                    }
+                })
+                .catch((err) => {
+                    console.log('ERROR: ', err)
+                })
             })
     } else {
         alert("시간이 만료되어 로그인이 해제되었습니다. 다시 로그인해주세요.")

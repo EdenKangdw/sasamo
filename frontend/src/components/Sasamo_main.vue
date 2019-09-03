@@ -1,9 +1,9 @@
 <template lang="html">
 <div>
-  <h1>{{ user.ssm_name }}님 환영합니다</h1>
-  <h1>{{ user.ssm_group }}팀 입니다</h1>
-  <h1>{{log}}</h1>
-  <input type="button" value="뒤로" @click="goBack">
+  <h1 ><span id="tm_info">{{ user.ssm_name }}</span>님 환영합니다</h1>
+  <h1><span id="tm_info">{{ user.ssm_group }}팀</span>입니다</h1> 
+  
+<input type="button" value="뒤로" @click="goBack">
   <input type="button" :value="btn_apply ? '사역신청 취소' : '사역신청'" @click="btnApply">
   <input type="button" :value="btn_check ? '출석취소' : '출석체크'" @click="btnCheck">
   <input type="button" :value="btn_team ? '팀 배정하기' : '팀 확인하기'" @click="myTeam">
@@ -11,6 +11,12 @@
 </div>
 
 </template>
+<style>
+#tm_info {
+    font-size: 1.4em;
+    color: #FF9CB4;
+}
+</style>
 
 <script>
 export default {
@@ -166,11 +172,6 @@ export default {
 
     
 },
-watch: {
-  isToday : function(newVal){
-    this.user.isToday = newVal
-  }
-}
 }
 </script>
 

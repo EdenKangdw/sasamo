@@ -5,7 +5,7 @@
   
 <input type="button" value="뒤로" @click="goBack">
   <input type="button" :value="btn_apply ? '사역신청 취소' : '사역신청'" @click="btnApply">
-  <input type="button" :value="btn_check ? '출석취소' : '출석체크'" @click="btnCheck">
+  <input v-if="btn_apply" type="button" :value="btn_check ? '출석취소' : '출석체크'" @click="btnCheck">
   <input type="button" :value="btn_team ? '팀 배정하기' : '팀 확인하기'" @click="myTeam">
   
 </div>
@@ -69,12 +69,14 @@ export default {
     btnCheck() {
       console.log("SSSSSSS")
       switch(this.btn_check){
-        case '출석체크' : 
+        case false : 
           console.log('user', this.user)
           this.check()
+          this.btn_check = true
           break
-        case '출석취소' : 
+        case true : 
           this.cancel()
+          this.btn_check = false
           break
         default :
           alert("sadfsdfdsf")
@@ -156,7 +158,8 @@ export default {
       console.log("LocalToken", token)
 
       this.$http.post('/api/sasamo/cancelCheck', {
-        token: token
+        token: token,
+        isTodayCheck: this.btn_check
       })
        .then((res) => {
         console.log('사역신청 취소 완료')

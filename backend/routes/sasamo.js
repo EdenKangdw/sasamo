@@ -41,7 +41,8 @@ function checkModel(userVal, eventVal) {
             ssm_name: userVal.ssm_name ? userVal.ssm_name : "n",
             evt_seq: eventVal.evt_seq ? eventVal.evt_seq : "n",
             evt_name: eventVal.evt_name ? eventVal.evt_name : "n",
-            today: "n"
+            isTodayApply: "n",
+            istodayCheck: "n"
         }
         resolve(data)
     })
@@ -226,7 +227,6 @@ function getEventToday(userVal) {
                         console.log("오늘의 이벤트: ", todayModel)
                         resolve(todayModel)
                     })
-
             }
         })
     })
@@ -380,7 +380,8 @@ router.post('/cancelCheck', function (req, res) {
     let today = ''
 
     if (decoded != null) {
-
+        let isTodayCheck = req.body.isTodayCheck
+        console.log("취소토큰",)
         getEventToday(decoded)
             .then(result => {
                 today = result
@@ -388,11 +389,11 @@ router.post('/cancelCheck', function (req, res) {
 
                 var ssm_seq = today.ssm_seq
                 var evt_seq = today.evt_seq
-                var check = today.today
-                console.log("CCCCCCCCHK:", check)
-
-                if (check == 'y') {
-                    var checkQuery = `update ssm_check set chk_isApply = 'n', UPDT = now() where evt_seq='${evt_seq}' and ssm_seq = '${ssm_seq}' `
+                
+                console.log("CCCCCCCCHK:", isTodayCheck)
+                // 체크안한 경우    
+                if (isTodayCheck) {
+                    var checkQuery = `update ssm_check set chk_isCheck = 'n', UPDT = now() where evt_seq='${evt_seq}' and ssm_seq = '${ssm_seq}' `
                     console.log('출석체크 취소 1: ', checkQuery)
                     connection.query(checkQuery, function (err, result) {
                         var data = resModel()
@@ -407,8 +408,9 @@ router.post('/cancelCheck', function (req, res) {
                             res.send(data)
                         }
                     })
+                    // 체크한 경우
                 } else {
-                    var query = `update ssm_check set chk_isCheck = 'n', updt = now() where evt_seq='${evt_seq}' and ssm_seq = '${ssm_seq}'  `
+                    var query = `update ssm_check set chk_isApply = 'n', updt = now() where evt_seq='${evt_seq}' and ssm_seq = '${ssm_seq}'  `
                     console.log('사역신청 취소 1 :', query)
                     connection.query(query, function (err, result) {
                         var data = resModel()

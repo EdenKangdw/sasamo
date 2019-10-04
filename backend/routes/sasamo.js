@@ -306,9 +306,11 @@ router.post('/check', function (req, res) {
     console.log('CHECK USER :', decoded.data)
 
     if (decoded != null) {
-        var ssm_seq = decoded.data.ssm_seq
-        var ssm_name = decoded.data.ssm_name
-        var ssm_team = decoded.data.ssm_team
+        let ssm_seq = decoded.data.ssm_seq
+        let ssm_name = decoded.data.ssm_name
+        let ssm_team = decoded.data.ssm_team
+        let isTodayCheck = req.body.isTodayCheck
+
         console.log('qQQqqqQQQQQQQQQQQ :', ssm_seq)
         var today = 'd'
         console.log('DATA :', decoded.data)
@@ -320,9 +322,9 @@ router.post('/check', function (req, res) {
 
                 // 기존 신청 이력이 있는지 확인하기, 없으면 사역신청, 있으면 출석체크 
                 getApplyCheckModel(ssm_seq, today.evt_seq).then(function (checkModel) {
-                    if (checkModel) {
+                    if (checkModel && isTodayCheck) {
                         // 출석체크 
-                        var checkQuery = `update ssm_check set chk_isApply = 'y' where ssm_seq = '${ssm_seq} ' `
+                        var checkQuery = `update ssm_check set chk_isCheck = 'y' where ssm_seq = '${ssm_seq}' `
                         checkQuery += `and evt_seq = ${today.evt_seq} and ssm_team = ${ssm_team}`
                         console.log('출석체크 1 : ', checkQuery)
                         connection.query(checkQuery, function (err) {
@@ -341,7 +343,7 @@ router.post('/check', function (req, res) {
                     } else {
                         // 사역신청 
                         var query = `insert into ssm_check(ssm_seq, ssm_name, ssm_team, evt_seq, evt_name, chk_isApply, chk_isCheck)`
-                        query += ` values(${ssm_seq}, '${ssm_name}', ${ssm_team} ,${today.evt_seq}, '${today.evt_name}', 'n', 'y')`
+                        query += ` values(${ssm_seq}, '${ssm_name}', ${ssm_team} ,${today.evt_seq}, '${today.evt_name}', 'y', 'n')`
                         console.log('insert query', query)
                         connection.query(query, function (err) {
                             var data = resModel()
@@ -389,7 +391,7 @@ router.post('/cancelCheck', function (req, res) {
 
                 var ssm_seq = today.ssm_seq
                 var evt_seq = today.evt_seq
-                
+
                 console.log("CCCCCCCCHK:", isTodayCheck)
                 // 체크안한 경우    
                 if (isTodayCheck) {
@@ -463,9 +465,9 @@ router.post('/group', function (req, res) {
 
 router.post('/signup', function (req, res) {
     console.log('REQ : data', req.body)
-    var query = `insert into ssm_member(ssm_name, ssm_id, ssm_pw, ssm_phone, ssm_isItrn, ssm_isHeal, ssm_isPrpt, ssm_isPstr, ssm_team) values `
+    var query = `insert into ssm_member(ssm_name, ssm_id, ssm_pw, ssm_phone, ssm_gen, ssm_type, ssm_team) values `
     query += `('${req.body.ssm_name}','${req.body.ssm_id}','${req.body.ssm_pw}','${req.body.ssm_phone}',`
-    query += `'${req.body.ssm_isItrn}','${req.body.ssm_isHeal}','${req.body.ssm_isPrpt}','${req.body.ssm_isPstr}','${req.body.ssm_team}')`;
+    query += `'${req.body.ssm_gen}','${req.body.ssm_type}','${req.body.ssm_team}')`;
     console.log(query)
     connection.query(query, function (err, result) {
         console.log('insert1')
@@ -480,14 +482,14 @@ router.post('/signup', function (req, res) {
 
 });
 
-// 나와 같은 팀인 팀원들을 가져온다 
-router.get('/myteam', (req, res) => {
+// 팀배정용_사역신청자 리스트 조회
+router.get('/team/applied', (req, res) => {
     let token = req.headers['access-token'] || req.query.token
     let decoded = jwt.decode(token, secretObj.secret)
 
     if (decoded) {
         let ssm_team = decoded.data.ssm_team
-        const query = `select * from ssm_check where ssm_team =${ssm_team}`
+        const query = `select * from ssm_member where ssm_team =${ssm_team}`
         connection.query(query, function (err, result) {
             var data = resModel()
             if (err) {

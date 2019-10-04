@@ -145,7 +145,8 @@ export default {
     
     this.$http.post('/api/sasamo/check',  {
       ssm_seq: this.user.ssm_seq,
-      ssm_name: this.user.ssm_name
+      ssm_name: this.user.ssm_name,
+      isTodayCheck: this.btn_check
     }, { headers: { 'access-token': token },  
     })
       .then((res) => {

@@ -32,16 +32,23 @@
         <td><input type="text" v-model="ssm_team"></td>
     </tr>
     <tr>
+        <td>기수 확인( {{ ssm_gen }} )</td>
+        <td>
+            <label for="ssm_gen1">1기</label>
+            <input type="radio" id="ssm_gen1" value="1" v-model="ssm_gen">
+            <label for="ssm_gen2">2기</label>
+            <input type="radio" id="ssm_gen2" value="2" v-model="ssm_gen">
+        </td>
+    </tr>
+    <tr>
         <td>담당사역 확인( {{ checkedDuty }} )</td>
         <td>
-            <label for="intern">수습사역자</label>
-            <input type="checkbox" id="intern" value="I" v-model="ssm_isItrn">
-            <label for="heal">치유사역자</label>
-            <input type="checkbox" id="heal" value="H" v-model="ssm_isHeal">
+            <label for="intern">훈련생</label>
+            <input type="radio" id="intern" value="I" v-model="checkedDuty">
             <label for="prophet">예언사역자</label>
-            <input type="checkbox" id="prophet" value="P" v-model="ssm_isPrpt">
-            <label for="pastor">목회자</label>
-            <input type="checkbox" id="pastor" value="M" v-model="ssm_isPstr">
+            <input type="radio" id="prophet" value="P" v-model="checkedDuty">
+            <label for="pastor">교역자</label>
+            <input type="radio" id="pastor" value="M" v-model="checkedDuty">
         </td>
     </tr>
 </table>
@@ -58,24 +65,28 @@ export default {
   },
   data () {
     return {
-      checkedDuty: [],
+      checkedDuty: '',
       idIsChecked: "n",
-      idLog: "아이디를 입력해주세요"
+      idLog: "아이디를 입력해주세요",
+        ssm_type : '',
+      ssm_gen : ''
+
     }
   },
   methods: {
       goSignup() {
       console.log(this.ssm_phone)
+      this.ssm_type = this.checkedDuty
+        console.log('TYPE : ' ,this.ssm_type)
+      
         this.$http.post('/api/sasamo/signup', {
           ssm_name : this.ssm_name,
           ssm_id : this.ssm_id,
           ssm_pw : this.ssm_pw,
           ssm_phone: this.ssm_phone,
           ssm_team : this.ssm_team,
-          ssm_isItrn : this.ssm_isItrn ? "Y" : "N",
-          ssm_isHeal : this.ssm_isHeal ? "Y" : "N",
-          ssm_isPrpt : this.ssm_isPrpt ? "Y" : "N",
-          ssm_isPstr : this.ssm_isPstr ? "Y" : "N"
+          ssm_type : this.ssm_type,
+          ssm_gen : this.ssm_gen,
 
         })
       this.$router.push({ name: 'sasamo'})

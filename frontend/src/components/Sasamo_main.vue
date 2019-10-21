@@ -143,8 +143,6 @@ export default {
     
     
     this.$http.post('/api/sasamo/check',  {
-      isTodayCheck: this.btn_check,
-      isTodayApply : this.btn_apply,
       eventSeq : eventSeq
 
     }, { headers: { 'access-token': token },  
@@ -161,7 +159,6 @@ export default {
 
       this.$http.post('/api/sasamo/cancelCheck', {
         token: token,
-        isTodayCheck: this.btn_check,
         eventSeq : eventSeq
       })
        .then((res) => {

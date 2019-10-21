@@ -12,6 +12,7 @@
         <td>아이디</td>
         <td><input type="text" v-model="ssm_id">
         <input type="button" value="아이디 중복체크" @click="checkId">
+        {{ idLog }}
         <input type="hidden" :value="idIsChecked">
         </td>
     </tr>
@@ -65,39 +66,49 @@ export default {
   },
   data () {
     return {
-      checkedDuty: '',
-      idIsChecked: "n",
-      idLog: "아이디를 입력해주세요",
+        checkedDuty: '',
+        idIsChecked: "n",
+        idLog: "아이디를 입력해주세요",
         ssm_type : '',
-      ssm_gen : ''
+        ssm_gen : '',
+        isRightPassword : 'n'
 
     }
   },
   methods: {
       goSignup() {
-      console.log(this.ssm_phone)
-      this.ssm_type = this.checkedDuty
-        console.log('TYPE : ' ,this.ssm_type)
+          if(this.idIsChecked != 'y'){
+              alert('중복되지 않는 아이디를 입력해주세요')
+          } else {
+            console.log(this.ssm_phone)
+            this.ssm_type = this.checkedDuty
+            console.log('TYPE : ' ,this.ssm_type)
       
-        this.$http.post('/api/sasamo/signup', {
-          ssm_name : this.ssm_name,
-          ssm_id : this.ssm_id,
-          ssm_pw : this.ssm_pw,
-          ssm_phone: this.ssm_phone,
-          ssm_team : this.ssm_team,
-          ssm_type : this.ssm_type,
-          ssm_gen : this.ssm_gen,
-
-        })
-      this.$router.push({ name: 'sasamo'})
-      console.log('goMain')
+            this.$http.post('/api/sasamo/signup', {
+                ssm_name : this.ssm_name,
+                ssm_id : this.ssm_id,
+                ssm_pw : this.ssm_pw,
+                ssm_phone: this.ssm_phone,
+                ssm_team : this.ssm_team,
+                ssm_type : this.ssm_type,
+                ssm_gen : this.ssm_gen,
+            })
+            this.$router.push({ name: 'sasamo'})
+            console.log('goMain')
+        }
     },
     checkId(){
-        this.$http.post('api/sasamo/checkId', {
+        this.$http.post('api/sasamo/checkid', {
             id : this.ssm_id
         }).then(res => {
-            this.idIsChecked = 'y'
-            this.idLog = "사용가능한 아이디입니다"
+            console.log('checkID :',res)
+            if(res.data.data){
+                this.idIsChecked = 'y'
+                this.idLog = "사용가능한 아이디입니다"
+            } else {
+                this.idIsChecked = 'n'
+                this.idLog = "이미 사용중인 아이디입니다"
+            }
         })
 
     },

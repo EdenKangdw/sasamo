@@ -27,6 +27,7 @@ function userModel(userVal, checkStatus, Boolean) {
         isTodayApply: checkStatus.chk_isApply ? checkStatus.chk_isApply : 'none',
         istodayCheck: checkStatus.chk_isCheck ? checkStatus.chk_isCheck : 'none',
         leader: userVal.ssm_tmldr ? userVal.ssm_tmldr : "n",
+        eventSeq : checkStatus.evt_seq ? checkStatus.evt_seq : "n", 
         ok: Boolean ? Boolean : false
     };
     resolve(data)
@@ -48,10 +49,14 @@ function checkModel(userVal, eventVal) {
     })
 }
 
-
-
-
-
+arrangeModel = (checkVal, teamList) => {
+    return new Promise((resolve, reject) => {
+        let data = {
+             
+        }
+    })
+}
+    
 
 function teamModel(count, group) {
     return {
@@ -69,7 +74,7 @@ function statusModel(todayModel) {
                 reject(err)
                 throw err
             } else {
-                let data = result[0]
+                let data = result
                 console.log('Status :', data)
                 resolve(data)
             }
@@ -126,11 +131,10 @@ router.get('/getUserInfo', (req, res) => {
                 console.log('dddddddd',todayModel)
                 statusModel(todayModel)
                 .then((checkStatus) => {
-
-                    console.log('this is status:', checkStatus)
+                    console.log('this is status:', checkStatus[0].chk_isApply)
                     if (checkStatus.chk_isApply != 'n') {
                         // 사역 신청을 한 경우
-                        userModel(decoded.data, checkStatus, true)
+                        userModel(decoded.data, checkStatus[0], true)
                         .then((user) => {
                             console.log('success, today : Ok ', user)
                             res.send(user)
@@ -208,6 +212,7 @@ function enrollEvent(evt) {
         }
     })
 }
+
 // 오늘의 이벤트 정보 가져오기 
 function getEventToday(userVal) {
     // 오늘의 이벤트 정보를 가져온다 
@@ -279,14 +284,19 @@ router.get('/today', function (req, res) {
 // 기존 신청 여부 확인
 function getApplyCheckModel(userSeq, evtSeq) {
     return new Promise(function (resolve, reject) {
-        var query = `select * from ssm_check where ssm_seq = '${userSeq}' and evt_seq = '${evtSeq}'`
+        var query = `select * from ssm_check where ssm_seq = '${userSeq}' and evt_seq = '${evtSeq} order by CRDT desc'`
         connection.query(query, function (err, res) {
             var result = resModel()
             if (err) {
                 result.error = err
                 reject(new Error(err))
             } else if (res.length != 0) {
-                resolve(true)
+                let data = {
+                    isExist : true,
+                    isTodayApplied : res[0].chk_isApply,
+                    isTodayChecked : res[0].chk_isCheck
+                }
+                resolve(data)
             } else {
                 resolve(false)
             }
@@ -302,30 +312,85 @@ router.post('/check', function (req, res) {
     let token = req.headers['access-token'] || req.query.token
     let decoded = jwt.decode(token, secretObj.secret)
 
-    console.log('asdjfklasjdfk', token)
+    console.log('check token', token)
     console.log('CHECK USER :', decoded.data)
 
     if (decoded != null) {
-        let ssm_seq = decoded.data.ssm_seq
-        let ssm_name = decoded.data.ssm_name
-        let ssm_team = decoded.data.ssm_team
+        let {ssm_seq, ssm_name, ssm_team} = decoded.data
+        let eventSeq = req.body.eventSeq
+
+        // boolean
         let isTodayCheck = req.body.isTodayCheck
+        let isTodayApply = req.body.isTodayApply
 
-        console.log('qQQqqqQQQQQQQQQQQ :', ssm_seq)
-        var today = 'd'
-        console.log('DATA :', decoded.data)
+        // 기존 신청 이력이 있는지 확인하기, 없으면 사역신청, 있으면 출석체크 
+          getApplyCheckModel(ssm_seq, eventSeq)
+                    .then(function (checkModel) {
+                    console.log('CHECK MODEL : ',checkModel.isTodayApplied)
+                    switch(checkModel.isTodayApplied){
+                        case 'y' : 
+                            // 출석체크 update
+                            let checkQuery = `update ssm_check set chk_isCheck = 'y' where ssm_seq = '${ssm_seq}' `
+                                checkQuery += `and evt_seq = ${eventSeq} and ssm_team = ${ssm_team}`
+                            console.log('출석체크 1 : ', checkQuery)
+                            connection.query(checkQuery, function (err) {
+                                var data = resModel()
+                                if (err) {
+                                    console.log(err)
+                                    data.error = err
+                                    res.send(data)
+                                    throw err
+                                } else {
+                                    console.log('출석체크 2 : 성공')
+                                    data.success = true
+                                    res.send(data)
+                                }
+                            })
+                            break
 
-        getEventToday(decoded)
-            .then(function (result) {
-                today = result
-                console.log('TOOOOODAY', today)
+                        case 'n' :
+                            // 재사역신청 update
+                            let applyQuery = `update ssm_check set chk_isApply = 'y' where ssm_seq = '${ssm_seq}' `
+                                applyQuery += `and evt_seq = ${eventSeq} and ssm_team = ${ssm_team}`
+                            console.log('재사역신청 1 : ', applyQuery)
+                            connection.query(applyQuery, function (err) {
+                                var data = resModel()
+                                if (err) {
+                                    console.log(err)
+                                    data.error = err
+                                    res.send(data)
+                                    throw err
+                                } else {
+                                    console.log('출석체크 2 : 성공')
+                                    data.success = true
+                                    res.send(data)
+                                }
+                            })
+                            break
 
-                // 기존 신청 이력이 있는지 확인하기, 없으면 사역신청, 있으면 출석체크 
-                getApplyCheckModel(ssm_seq, today.evt_seq).then(function (checkModel) {
-                    if (checkModel && isTodayCheck) {
-                        // 출석체크 
-                        var checkQuery = `update ssm_check set chk_isCheck = 'y' where ssm_seq = '${ssm_seq}' `
-                        checkQuery += `and evt_seq = ${today.evt_seq} and ssm_team = ${ssm_team}`
+                        default :
+                            // 사역신청 
+                            var query = `insert into ssm_check(ssm_seq, ssm_name, ssm_team, evt_seq, evt_name, chk_isApply, chk_isCheck)`
+                                query += ` values(${ssm_seq}, '${ssm_name}', ${ssm_team} ,${eventSeq}, 'null', 'y', 'n')`
+                                console.log('insert query', query)
+                            connection.query(query, function (err) {
+                                var data = resModel()
+                                if (err) {
+                                    console.log(err)
+                                    data.error = err
+                                    res.send(data)
+                                    throw err
+                                } else {
+                                    console.log('insert: 사역신청 완료')
+                                    data.success = true
+                                    res.send(data)
+                                }
+                            })
+                        }
+                    /* if (checkModel.isTodayApplied == 'y') {
+                        // 출석체크 update
+                        let checkQuery = `update ssm_check set chk_isCheck = 'y' where ssm_seq = '${ssm_seq}' `
+                            checkQuery += `and evt_seq = ${eventSeq} and ssm_team = ${ssm_team}`
                         console.log('출석체크 1 : ', checkQuery)
                         connection.query(checkQuery, function (err) {
                             var data = resModel()
@@ -343,7 +408,7 @@ router.post('/check', function (req, res) {
                     } else {
                         // 사역신청 
                         var query = `insert into ssm_check(ssm_seq, ssm_name, ssm_team, evt_seq, evt_name, chk_isApply, chk_isCheck)`
-                        query += ` values(${ssm_seq}, '${ssm_name}', ${ssm_team} ,${today.evt_seq}, '${today.evt_name}', 'y', 'n')`
+                        query += ` values(${ssm_seq}, '${ssm_name}', ${ssm_team} ,${eventSeq}, 'null', 'y', 'n')`
                         console.log('insert query', query)
                         connection.query(query, function (err) {
                             var data = resModel()
@@ -358,20 +423,19 @@ router.post('/check', function (req, res) {
                                 res.send(data)
                             }
                         })
-                    }
+                    } */
                 })
-            })
+            
             .catch(function (err) {
                 res.send(err)
                 console.log(err)
             })
 
-    } else {
-        console.log('errpr')
-    }
+    } 
 
 
 })
+
 
 
 router.post('/cancelCheck', function (req, res) {
@@ -380,10 +444,10 @@ router.post('/cancelCheck', function (req, res) {
     let decoded = jwt.decode(token, secretObj.secret)
     console.log('CANCEL TOKEN', token)
     let today = ''
+    let eventSeq = req.body.eventSeq
 
     if (decoded != null) {
         let isTodayCheck = req.body.isTodayCheck
-        console.log("취소토큰",)
         getEventToday(decoded)
             .then(result => {
                 today = result
@@ -482,14 +546,45 @@ router.post('/signup', function (req, res) {
 
 });
 
+// 팀배정용_배정 가능 팀 목록 조회
+router.get('/team/list', (req, res) => {
+    let token = req.headers['access-token'] || req.query.token
+    let decoded = jwt.decode(token, secretObj.secret)
+
+    if(decoded){
+        let team = decoded.data.ssm_team
+        const query = `select * from ssm_team where tm_number = ${team}`
+        connection.query(query, function (err, result) {
+            var data = resModel()
+            if (err) {
+                console.log(err)
+                data.success = false
+                data.error = err
+                throw err
+            } else {
+                data.success = true
+                data.data = result[0].tm_teamList
+                console.log('TEAM : ', data.data, typeof data.data)
+                res.send(data)
+            }
+        })
+
+    } else { 
+        var data = resModel()
+        data.error = `ERROR: we couldn't get vaild token`
+        res.send(data)
+    }
+}),
+
 // 팀배정용_사역신청자 리스트 조회
-router.get('/team/applied', (req, res) => {
+router.get('/team/applied', async (req, res) => {
     let token = req.headers['access-token'] || req.query.token
     let decoded = jwt.decode(token, secretObj.secret)
 
     if (decoded) {
         let ssm_team = decoded.data.ssm_team
-        const query = `select * from ssm_member where ssm_team =${ssm_team}`
+        const query = `select * from ssm_check where ssm_team = ${ssm_team} and chk_isApply = 'y'`
+
         connection.query(query, function (err, result) {
             var data = resModel()
             if (err) {
@@ -513,6 +608,53 @@ router.get('/team/applied', (req, res) => {
 
     }
 })
+
+// 팀배정하기 
+
+router.post('/team/arrange', function (req, res) {
+    console.log('ARRANGE')
+    let token = req.headers['access-token'] || req.body.token
+    let decoded = jwt.decode(token, secretObj.secret)
+    console.log('DECODE :',decoded)
+    console.log('parameter :', decoded.data.ssm_tmldr)
+    if(decoded){
+        let editTeam = req.body.editTeam
+        console.log(typeof editTeam)
+        let eventSeq = req.body.eventSeq
+        console.log('eventCode',eventSeq)
+        console.log('EDIT TEAM :',editTeam[0].ssm_group)
+        for(var i=0; i<editTeam.length; i++){
+            const updateQuery = `update ssm_check set ssm_group ='${editTeam[i].ssm_group}' where ssm_seq='${editTeam[i].id}' and evt_seq ='${eventSeq}'`
+            connection.query(updateQuery, (err, result) => {
+                console.log('EDIT TEAM')
+                if(err){
+                    console.log(err)
+                    throw err
+                } else {
+                    console.log('success update', i)
+                }
+            })
+        }
+        
+
+    } else { 
+        var query = `insert into ssm_member(ssm_name, ssm_id, ssm_pw, ssm_phone, ssm_gen, ssm_type, ssm_team) values `
+        query += `('${req.body.ssm_name}','${req.body.ssm_id}','${req.body.ssm_pw}','${req.body.ssm_phone}',`
+        query += `'${req.body.ssm_gen}','${req.body.ssm_type}','${req.body.ssm_team}')`;
+        console.log(query)
+        connection.query(query, function (err, result) {
+            console.log('insert1')
+            if (err) {
+                console.log(err)
+                throw err;
+            } else {
+                console.log('success insert')
+            }
+        })
+    }
+
+
+});
 
 
 

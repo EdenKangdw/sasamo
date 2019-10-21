@@ -40,7 +40,7 @@ export default {
   data () {
     return {
       token: "",
-      log: this.$store.state.count
+      log: this.$store.state.greeting
     }
   },
   methods: {

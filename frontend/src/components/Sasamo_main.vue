@@ -40,6 +40,7 @@ export default {
         if(this.user.ok){
           console.log("isToday? :", this.user.isTodayApply)
           // 로그인 성공 
+          this.$store.commit("updateEvent", this.user.eventSeq) 
           if(this.user.leader != null){
             // 팀장인 경우 
             this.loginLeader(this.user.isTodayApply)
@@ -63,9 +64,6 @@ export default {
     }
   },
   methods: {
-
-    
-
     btnCheck() {
       console.log("SSSSSSS")
       switch(this.btn_check){
@@ -141,12 +139,14 @@ export default {
     check() {
       let token = localStorage.getItem('access_token')
       console.log("LocalToken", token)
+      let eventSeq = localStorage.getItem('Event')
     
     
     this.$http.post('/api/sasamo/check',  {
-      ssm_seq: this.user.ssm_seq,
-      ssm_name: this.user.ssm_name,
-      isTodayCheck: this.btn_check
+      isTodayCheck: this.btn_check,
+      isTodayApply : this.btn_apply,
+      eventSeq : eventSeq
+
     }, { headers: { 'access-token': token },  
     })
       .then((res) => {
@@ -157,10 +157,12 @@ export default {
     cancel(){
       let token = localStorage.getItem('access_token')
       console.log("LocalToken", token)
+      let eventSeq = localStorage.getItem('Event')
 
       this.$http.post('/api/sasamo/cancelCheck', {
         token: token,
-        isTodayCheck: this.btn_check
+        isTodayCheck: this.btn_check,
+        eventSeq : eventSeq
       })
        .then((res) => {
         console.log('사역신청 취소 완료')

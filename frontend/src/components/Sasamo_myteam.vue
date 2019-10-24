@@ -120,11 +120,11 @@ export default {
      },
      goArrange() {
             let token = localStorage.getItem('access_token')
-            let eventSeq = localStorage.getItem('Event')
-            console.log('eventcode :',eventSeq)
+            let evt_seq = localStorage.getItem('Event')
+            console.log('eventcode :',evt_seq)
             this.$http.post('/api/sasamo/team/arrange',  {
                 editTeam: this.editTeam,
-                eventSeq: eventSeq
+                evt_seq: evt_seq
                 }, { headers: { 'access-token': token }  
             })
             .then(

@@ -31,7 +31,7 @@ export default {
     }
 
     // 유저정보 api 요청 : 오늘에 대해 출석체크를 했는지 값도 리턴됨
-    this.$http.get('/api/sasamo/getUserInfo', config)
+    this.$http.get('/api/sasamo//user/info', config)
       .then((res) => {
         console.log('RESULT : ', res.data)
         // 로그인이 완료되면 오늘 이벤트에 사역신청 했는지 확인 
@@ -41,13 +41,13 @@ export default {
           console.log("isToday? :", this.user.isTodayApply)
           // 로그인 성공 
           this.$store.commit("updateEvent", this.user.eventSeq) 
-          if(this.user.leader != null){
+          if(this.user.leader === 'y'){
             // 팀장인 경우 
-            this.loginLeader(this.user.isTodayApply)
+            this.loginLeader(this.user.isTodayApply, this.user.isTodayCheck)
             console.log('a',this.btn_apply)
         } else {
           // 일반 사역자의 경우 
-            this.loginNormal(this.user.isTodayApply)
+            this.loginNormal(this.user.isTodayApply, this.user.isTodayCheck)
             console.log('b',this.btn_apply)
         }
       }
@@ -100,50 +100,58 @@ export default {
       }
       
     },
+    // 출석체크가 y인 경우 체크해야함 
 
-    loginLeader(isTodayApply){
-      switch (isTodayApply) {
-              // 팀장 이면서 사역신청해야함 
-              case 'n' : 
-              this.btn_apply = false
-              this.btn_check = false
+    loginLeader(isTodayApply, isTodayCheck){
+      if (isTodayApply == 'y' && isTodayCheck == 'y') {
+              // 팀장 이면서 사역신청 o 출석체크 o
+              console.log('L : O/O')
+              this.btn_apply = true
+              this.btn_check = true
               this.btn_team = true
-              break
-
-              // 이미 신청함
-              case 'y' :
+      } else if (isTodayApply === 'y' && isTodayCheck === 'n'){
+              // 팀장이면서 신청 o 체크 x
+              console.log('L : O/X')
               this.btn_apply = true
               this.btn_check = false
               this.btn_team = true
-              break
+            } else {
+              console.log('L : X/X')
+              this.btn_apply = false
+              this.btn_check = false
+              this.btn_team = true
             }
     },
-    loginNormal(isTodayApply){
-      switch (isTodayApply) {
-              // 일반 이면서 사역신청 해야함
-              case 'n' : 
-              this.btn_apply = false,
+    loginNormal(isTodayApply, isTodayCheck){
+      console.log('IS :', isTodayApply, isTodayCheck)
+      if (isTodayApply == 'y' && isTodayCheck == 'y') {
+              // 일반 이면서 사역신청 o 출석체크 o
+              console.log('N : O/O')
+              this.btn_apply = true
+              this.btn_check = true
+              this.btn_team = false
+      } else if (isTodayApply === 'y' && isTodayCheck === 'n'){
+              // 일반이면서 신청 o 체크 x
+              console.log('N : O/X')
+              this.btn_apply = true
               this.btn_check = false
               this.btn_team = false
-              break
-
-              // 신청함 
-              case 'y' :
-              this.btn_apply = true,
+            } else { // 일반 : 신청 x 체크 x
+              console.log('N: X/X')
+              this.btn_apply = false
               this.btn_check = false
               this.btn_team = false
-              break
             }
     },
 
     check() {
       let token = localStorage.getItem('access_token')
       console.log("LocalToken", token)
-      let eventSeq = localStorage.getItem('Event')
+      let evt_seq = localStorage.getItem('Event')
     
     
     this.$http.post('/api/sasamo/check',  {
-      eventSeq : eventSeq
+      evt_seq : evt_seq
 
     }, { headers: { 'access-token': token },  
     })
@@ -155,11 +163,11 @@ export default {
     cancel(){
       let token = localStorage.getItem('access_token')
       console.log("LocalToken", token)
-      let eventSeq = localStorage.getItem('Event')
+      let evt_seq = localStorage.getItem('Event')
 
       this.$http.post('/api/sasamo/cancelCheck', {
         token: token,
-        eventSeq : eventSeq
+        evt_seq : evt_seq
       })
        .then((res) => {
         console.log('사역신청 취소 완료')

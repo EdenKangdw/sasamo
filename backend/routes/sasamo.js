@@ -149,6 +149,7 @@ router.get('/user/info', (req, res) => {
                                     console.log('success, today : NO ', user)
                                     res.send(user)
                                 })
+                                break
                             
                             default :
                                 // 처음 로그인을 하는 경우
@@ -157,6 +158,8 @@ router.get('/user/info', (req, res) => {
                                     console.log('success, first login', user)
                                     res.send(user)
                                 })
+                                break
+                                
                                 
 
                         }

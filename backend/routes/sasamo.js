@@ -144,7 +144,7 @@ router.get('/user/info', (req, res) => {
 
                             case 'n' :
                                 // 사역신청을 안한 경우
-                                userModel(decoded.data, checkStatus, true)
+                                userModel(decoded.data, checkStatus[0], true)
                                 .then((user) => {
                                     console.log('success, today : NO ', user)
                                     res.send(user)
@@ -560,9 +560,16 @@ router.get('/team/list', (req, res) => {
                 data.success = false
                 data.error = err
                 throw err
-            } else {
+            } else if(result[0] != null){
+                // 우리팀에 신청한 사람이 있을 때
                 data.success = true
                 data.data = result[0].tm_teamList
+                console.log('TEAM : ', data.data, typeof data.data)
+                res.send(data)
+            } else {
+                // 우리팀에 신청한 사람이 없을 때 
+                data.success = true
+                data.data = 'none'
                 console.log('TEAM : ', data.data, typeof data.data)
                 res.send(data)
             }
@@ -582,7 +589,8 @@ router.get('/team/list', (req, res) => {
 
         if (decoded) {
             let ssm_team = decoded.data.ssm_team
-            const query = `select * from ssm_check where ssm_team = ${ssm_team} and chk_isApply = 'y'`
+            let ssm_seq = decoded.data.ssm_seq
+            const query = `select * from ssm_check where ssm_team = ${ssm_team} and chk_isApply = 'y' and ssm_seq <> ${ssm_seq}`
 
             connection.query(query, function (err, result) {
                 var data = resModel()

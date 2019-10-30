@@ -64,8 +64,14 @@ export default {
 
     this.$http.get('/api/sasamo/team/list', config)
         .then((result) => {
-            this.teamList = result.data.data.split(",")
-            console.log('VUE TEAMLIST :', this.teamList, typeof this.teamList, this.editTeam)
+            if(result.data.data != 'none'){
+                console.log(result.data.data)
+                this.teamList = result.data.data.split(",")
+                console.log('VUE TEAMLIST :', this.teamList, typeof this.teamList, this.editTeam)
+            } else {
+                console.log(result.data.data)
+                this.teamList = []
+            }
         })
 
     this.$http.get('/api/sasamo/team/applied', config)

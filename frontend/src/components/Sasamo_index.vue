@@ -1,20 +1,23 @@
 <template lang="html">
 <div id="app">
-    <h1> {{ log }} </h1>
+    <img src="../assets/beloved_logo2.png">
+<img src="../assets/beloved_logo1.png">
+
+    
     <form id="loginForm" @submit.prevent='login' action="/login">
         <table id="login">
             <tr>
                 <td>ID</td>
-                <td><input type="text" name="id" v-model="ssm_id"></td>
+                <td><input class="form-control" type="text" name="id" v-model="ssm_id"></td>
             </tr>
             <tr>
                 <td>비밀번호</td>
-                <td><input type="password" name="pw" v-model="ssm_pw"></td>
+                <td><input class="form-control" type="password" name="pw" v-model="ssm_pw"></td>
             </tr>
             <tr>
                 <td colspan="2">
-                    <input type="submit" value="login">
-                    <input type="button" value="회원가입" v-on:click="signup"> 
+                    <input class="btn btn-primary" type="submit" value="login">
+                    <input class="btn btn-primary" type="button" value="회원가입" v-on:click="signup"> 
                 </td>
             </tr>
         </table>
@@ -40,7 +43,7 @@ export default {
   data () {
     return {
       token: "",
-      log: this.$store.state.greeting
+      greeting: "사역자님 안녕하세요!"
     }
   },
   methods: {

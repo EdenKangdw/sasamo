@@ -60,7 +60,6 @@ export default {
       btn_apply: false,
       btn_check: false,
       btn_team: false,
-      log: this.$store.state.log
     }
   },
   methods: {

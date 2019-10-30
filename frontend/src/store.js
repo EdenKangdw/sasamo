@@ -5,7 +5,6 @@ Vue.use(Vuex)
 
 export const store = new Vuex.Store({
   state: {
-    greeting: "안녕하세요. 사사모사역자님",
     token: "",
     log : "HELLO",
     event: "",

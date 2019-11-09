@@ -4,7 +4,7 @@ module.exports = (function () {
         host: 'localhost',
         port: '3306',
         user: 'root',
-        password: 'sasamo',
+        password: '1111',
         database: 'sasamo'
       },
       real: { // real server db info

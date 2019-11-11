@@ -14,7 +14,7 @@
 <style>
 #tm_info {
     font-size: 1.4em;
-    color: #FF9CB4;
+    color: #fc94af;
 }
 </style>
 

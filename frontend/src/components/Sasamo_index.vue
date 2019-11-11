@@ -1,9 +1,45 @@
 <template lang="html">
-<div id="app">
-    <img src="../assets/beloved_logo2.png">
-<img src="../assets/beloved_logo1.png">
-
+<div id="app" class="container">
     
+    
+    <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-4" id="logo_container">
+            <img id="logo2" src="../assets/beloved_logo2.png">
+            <img id="logo1" src="../assets/beloved_logo1.png">
+        </div>
+        <div class="col-md-4"></div>
+    </div>
+        
+
+    <div class="row" id="login">
+        <div class="col-md-4"></div>
+        <div class="col-md-4">
+            <form id="loginForm" @submit.prevent='login' action="/login">
+             <label>salkdjflksdf</label>
+        </div>
+            <div class="col-md-4"><div>
+                <td>ID</td>
+                <td><input class="form-control" type="text" name="id" v-model="ssm_id"></td>
+            </tr>
+            <tr>
+                <td>비밀번호</td>
+                <td><input class="form-control" type="password" name="pw" v-model="ssm_pw"></td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <div id="wrapper_btn">
+                    <input class="btn btn-primary" type="button" value="회원가입" v-on:click="signup"> 
+                    <input class="btn btn-primary" type="submit" value="로그인">
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </form>
+        </div>
+        <div class="col-md-4"></div>
+<!-- test -->
+    </div> 
     <form id="loginForm" @submit.prevent='login' action="/login">
         <table id="login">
             <tr>
@@ -16,12 +52,15 @@
             </tr>
             <tr>
                 <td colspan="2">
-                    <input class="btn btn-primary" type="submit" value="login">
+                    <div id="wrapper_btn">
                     <input class="btn btn-primary" type="button" value="회원가입" v-on:click="signup"> 
+                    <input class="btn btn-primary" type="submit" value="로그인">
+                    </div>
                 </td>
             </tr>
         </table>
     </form>
+    
 </div>
         
 </template>
@@ -31,6 +70,9 @@
     margin-left: auto; 
     margin-right: auto;
 
+}
+#wrapper_btn{
+    margin-top: 10%;
 }
 </style>
 

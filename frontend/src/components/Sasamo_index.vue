@@ -1,7 +1,6 @@
 <template lang="html">
 <div id="app" class="container">
     
-    
     <div class="row">
         <div class="col-md-4"></div>
         <div class="col-md-4" id="logo_container">
@@ -10,6 +9,9 @@
         </div>
         <div class="col-md-4"></div>
     </div>
+
+<!--    
+    
         
 
     <div class="row" id="login">
@@ -37,9 +39,9 @@
         </table>
     </form>
         </div>
-        <div class="col-md-4"></div>
-<!-- test -->
-    </div> 
+        <div class="col-md-4"></div>  -->
+
+    
     <form id="loginForm" @submit.prevent='login' action="/login">
         <table id="login">
             <tr>
@@ -60,6 +62,7 @@
             </tr>
         </table>
     </form>
+   
     
 </div>
         

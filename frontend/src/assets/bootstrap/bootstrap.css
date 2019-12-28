@@ -375,7 +375,7 @@ h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
   margin-bottom: 0.5rem;
   font-family: "News Cycle", "Arial Narrow Bold", sans-serif;
-  font-weight: 700;
+  font-weight: 300;
   line-height: 1.1;
 }
 
@@ -405,6 +405,22 @@ h6, .h6 {
 
 /* 여기부터 쓰면 됨 */
 
+
+.content-wrapper{
+  background-image: url('../flower_pattern.jpg');
+  border-radius: 5%;
+  z-index: 1;
+}
+
+
+.txt-wrapper {
+  margin-top: 5%;
+  opacity: 100%;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 5%;
+  
+}
+
 #logo_container{
   float:block;
   margin-top: 15%;
@@ -420,6 +436,18 @@ h6, .h6 {
 }
 #background_index {
   background-image: url('../wallpaper2.jpg') 
+}
+.btn_wrapper{
+  margin-top: 5%;
+}
+
+.btn_item {
+  margin-top : 2%;
+}
+
+#tm_info {
+  font-size: 1.2em;
+  color: #fc94af;
 }
 
 
@@ -2578,6 +2606,7 @@ textarea.form-control {
 }
 
 .btn {
+  width: 45%;
   display: inline-block;
   font-weight: 400;
   color: #222;
@@ -2617,6 +2646,17 @@ textarea.form-control {
           box-shadow: 0 0 0 0.2rem rgba(235, 104, 100, 0.25);
 }
 
+.btn-back {
+  margin-top: 5%;
+  width: 10%;
+  height: 10%;
+  background: #FFFFFF;
+  border: 2px solid #fc94af;
+  border-radius: 50%;
+  align-content: center;
+  color: #b37a89;
+}
+
 .btn.disabled, .btn:disabled {
   opacity: 0.65;
 }
@@ -2645,15 +2685,15 @@ fieldset:disabled a.btn {
 
 .btn-primary.disabled, .btn-primary:disabled {
   color: #fff;
-  background-color: #EB6864;
-  border-color: #EB6864;
+  background-color: #fc94af;
+  border-color: #fc94af;
 }
 
 .btn-primary:not(:disabled):not(.disabled):active, .btn-primary:not(:disabled):not(.disabled).active,
 .show > .btn-primary.dropdown-toggle {
   color: #fff;
-  background-color: #e53c37;
-  border-color: #e4312c;
+  background-color: #fc94af;
+  border-color: #fc94af;
 }
 
 .btn-primary:not(:disabled):not(.disabled):active:focus, .btn-primary:not(:disabled):not(.disabled).active:focus,

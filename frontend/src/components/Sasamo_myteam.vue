@@ -1,6 +1,6 @@
 <template lang="html">
 <div id="app">
-    <h1> {{ greeting }} </h1>
+    <h2> {{ greeting }} </h2>
     <form id="teamForm" @submit.prevent='arrange' action="/team">
         <table id="myteam" border="1px soild black" style="margin-left: auto; margin-right: auto;">
             <tr>

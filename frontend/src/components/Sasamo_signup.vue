@@ -2,57 +2,58 @@
 <div>
   <h1>회원가입 페이지입니다.</h1>
   <h1>담당사역 확인( {{ checkedDuty }} )</h1>
-  <form id="signupForm" @submit.prevent='goSignup'>
-  <table border="1px soild black" style="margin-left: auto; margin-right: auto;">
-    <tr>
-        <td>이름</td>
-        <td><input type="text" v-model="ssm_name"></td>
-    </tr>
-    <tr>
-        <td>아이디</td>
-        <td><input type="text" v-model="ssm_id">
+  <form role="form" id="signupForm" @submit.prevent='goSignup'>
+    <div class="form-group">
+        <label for="name" class="control-label">이름</label>
+        <input type="text" class="form-control" id="name" v-model="ssm_name">
+    </div>
+    <div class="form-group">
+        <label for="id">아이디</label>
+        <input type="text" class="form-control" id="id" v-model="ssm_id">
         <input type="button" value="아이디 중복체크" @click="checkId">
         {{ idLog }}
         <input type="hidden" :value="idIsChecked">
-        </td>
-    </tr>
-    <tr>
-        <td>비밀번호</td>
-        <td><input type="password" v-model="ssm_pw"></td>
-    </tr>
-    <tr>
-        <td>비밀번호 확인</td>
-        <td><input type="password"></td>
-    </tr>
-    <tr>
-        <td>연락처(-없이 입력해주세요)</td>
-        <td><input type="text" v-model="ssm_phone"></td>
-    </tr>
-    <tr>
-        <td>팀 번호</td>
-        <td><input type="text" v-model="ssm_team"></td>
-    </tr>
-    <tr>
-        <td>기수 확인( {{ ssm_gen }} )</td>
-        <td>
-            <label for="ssm_gen1">1기</label>
-            <input type="radio" id="ssm_gen1" value="1" v-model="ssm_gen">
-            <label for="ssm_gen2">2기</label>
-            <input type="radio" id="ssm_gen2" value="2" v-model="ssm_gen">
-        </td>
-    </tr>
-    <tr>
-        <td>담당사역 확인( {{ checkedDuty }} )</td>
-        <td>
-            <label for="intern">훈련생</label>
-            <input type="radio" id="intern" value="I" v-model="checkedDuty">
-            <label for="prophet">예언사역자</label>
-            <input type="radio" id="prophet" value="P" v-model="checkedDuty">
-            <label for="pastor">교역자</label>
-            <input type="radio" id="pastor" value="M" v-model="checkedDuty">
-        </td>
-    </tr>
-</table>
+    </div>
+    <div class="form-group">
+        <label for="pw">비밀번호</label>
+        <input type="password" id="pw" class="form-control" v-model="ssm_pw">
+    </div>
+    <div class="form-group">
+        <label for="phone">전화번호</label>
+        <input type="text" id="phone" class="form-control" v-model="ssm_phone">
+    </div>
+    <div class="form-group">
+        <label for="team">팀 번호</label>
+        <input type="text" id="team" class="form-control" v-model="ssm_team">
+    </div>
+    <div class="form-group">
+        <label>사역자 기수 확인 ( {{ ssm_gen }} )</label>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" id="gen1" value="1" v-model="ssm_gen">
+            <label class="form-check-label" for="gen1">1기</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" id="gen2" value="2" v-model="ssm_gen">
+            <label class="form-check-label" for="gen2">2기</label>
+        </div>
+    </div>
+    <div class="form-group">
+        <label>담당 사역 ( {{ checkedDuty }} )</label>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" id="intern" value="I" v-model="checkedDuty">
+            <label class="form-check-label" for="intern">훈련생</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" id="prophet" value="P" v-model="checkedDuty">
+            <label class="form-check-label" for="prophet">예언사역자</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" id="pastor" value="M" v-model="checkedDuty">
+            <label class="form-check-label" for="pastor">훈련생</label>
+        </div>
+    </div>
+        
+    
       <input type="button" value="뒤로" @click="goBack">
       <input type="submit" value="회원가입">
     </form>

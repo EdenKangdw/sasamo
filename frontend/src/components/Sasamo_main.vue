@@ -1,22 +1,35 @@
 <template lang="html">
 <div>
-  <h1 ><span id="tm_info">{{ user.ssm_name }}</span>님 환영합니다</h1>
-  <h1><span id="tm_info">{{ user.ssm_group }}팀</span>입니다</h1> 
-  
-<input type="button" value="뒤로" @click="goBack">
-  <input type="button" :value="btn_apply ? '사역신청 취소' : '사역신청'" @click="btnApply">
-  <input v-if="btn_apply" type="button" :value="btn_check ? '출석취소' : '출석체크'" @click="btnCheck">
-  <input type="button" :value="btn_team ? '팀 배정하기' : '팀 확인하기'" @click="myTeam">
-  
-</div>
+  <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-4" id="logo_container">
+            <img id="logo2" src="../assets/beloved_logo2.png">
+            <img id="logo1" src="../assets/beloved_logo1.png">
+        </div>
+        <div class="col-md-4"></div>
+    </div>
+    <div class="content-wrapper">
+      <div class="col-md-4"></div>
+      <div class="col-md-4">
+  <div class="txt-wrapper">
+    <h2><span id="tm_info">{{ user.ssm_name }}</span>님 환영합니다</h2>
+    <h2><span id="tm_info">{{ user.ssm_group }}팀</span>입니다</h2> 
+  </div>
+  <div class="col-md-4"></div>
+  <div class="col-md-4 btn_wrapper"> 
+     <div class="btn_item"><input class="btn btn-primary" type="button" :value="btn_apply ? '사역신청 취소' : '사역신청'" @click="btnApply"></div>
+     <div class="btn_item"><input v-if="btn_apply" class="btn btn-primary" type="button" :value="btn_check ? '출석취소' : '출석체크'" @click="btnCheck"></div>
+     <div class="btn_item"><input class="btn btn-primary" type="button" :value="btn_team ? '팀 배정하기' : '팀 확인하기'" @click="myTeam"></div>
+     <div class="btn_item"><input class="btn-back" type="button" value="←" @click="goBack"></div>
+   </div>
+   <div class="col-md-4"></div>
+   </div>
+   </div>
+   <div class="col-md-4"></div>
+  </div>
 
 </template>
-<style>
-#tm_info {
-    font-size: 1.4em;
-    color: #fc94af;
-}
-</style>
+
 
 <script>
 export default {

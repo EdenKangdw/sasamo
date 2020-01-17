@@ -1,34 +1,51 @@
 <template lang="html">
-<div>
-  <div class="row">
-        <div class="col-md-4"></div>
-        <div class="col-md-4" id="logo_container">
-            <img id="logo2" src="../assets/beloved_logo2.png">
-            <img id="logo1" src="../assets/beloved_logo1.png">
-        </div>
-        <div class="col-md-4"></div>
-    </div>
-    <div class="content-wrapper">
-      <div class="col-md-4"></div>
-      <div class="col-md-4">
-  <div class="txt-wrapper">
-    <h2><span id="tm_info">{{ user.ssm_name }}</span>님 환영합니다</h2>
-    <h2><span id="tm_info">{{ user.ssm_group }}팀</span>입니다</h2> 
-  </div>
-  <div class="col-md-4"></div>
-  <div class="col-md-4 btn_wrapper"> 
-     <div class="btn_item"><input class="btn btn-primary" type="button" :value="btn_apply ? '사역신청 취소' : '사역신청'" @click="btnApply"></div>
-     <div class="btn_item"><input v-if="btn_apply" class="btn btn-primary" type="button" :value="btn_check ? '출석취소' : '출석체크'" @click="btnCheck"></div>
-     <div class="btn_item"><input class="btn btn-primary" type="button" :value="btn_team ? '팀 배정하기' : '팀 확인하기'" @click="myTeam"></div>
-     <div class="btn_item"><input class="btn-back" type="button" value="←" @click="goBack"></div>
-   </div>
-   <div class="col-md-4"></div>
-   </div>
-   </div>
-   <div class="col-md-4"></div>
-  </div>
+	<div class="row">
+<div class="total_container">
+		<!--Greed 1 start-->
+		
+			<div class="col-md-4"></div>
+  		<div class="col-md-4" id="logo_container">
+    		<img id="logo2" src="../assets/beloved_logo2.png">
+      	<img id="logo1" src="../assets/beloved_logo1.png">
+    	</div>
+    	<div class="col-md-4"></div>
+		
+		<!--Greed 1 end-->
+
+		<!--Greed 2 start-->
+		<div class="col-md-4"></div>
+		<div class="col-md-4 content-wrapper">
+  		<div>
+    		<h2><span class="user_info" id="tm_info">{{ user.ssm_name }}</span>님</h2>
+    		<h2><span class="user_info"id="tm_info">{{ user.ssm_group }}팀</span>입니다</h2> 
+  		</div>
+		</div>
+	  <div class="col-md-4"></div>
+
+		<!-- greed 2 end -->
+		<!--Greed 3 start-->
+  	<div class="col-md-4"></div>
+  	<div class="col-md-4 btn_wrapper"> 
+    	<div class="btn_item"><input class="btn btn-primary" type="button" :value="btn_apply ? '사역신청 취소' : '사역신청'" @click="btnApply"></div>
+     	<div class="btn_item"><input v-if="btn_apply" class="btn btn-primary" type="button" :value="btn_check ? '출석취소' : '출석체크'" @click="btnCheck"></div>
+     	<div class="btn_item"><input class="btn btn-primary" type="button" :value="btn_team ? '팀 배정하기' : '팀 확인하기'" @click="myTeam"></div>
+			<img class="btn-back" src="../assets/icons8-back-arrow-64.png" @click="goBack">
+     	<!-- <div class="btn_item"><input class="btn-back" type="button" value="←" @click="goBack"></div> -->
+   	</div>
+   	<div class="col-md-4"></div>
+		<!--Greed 3 end--> 
+
+   
+  	</div>
+</div>
 
 </template>
+<style scoped>
+	.row {
+		background-image: url('../assets/flower_pattern.jpg');
+		z-index: 1;
+	}
+</style>
 
 
 <script>

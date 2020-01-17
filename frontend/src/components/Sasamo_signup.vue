@@ -1,33 +1,34 @@
 <template lang="html">
-<div>
-  <h1>회원가입 페이지입니다.</h1>
-  <h1>담당사역 확인( {{ checkedDuty }} )</h1>
+<div class="row">
+	<div class="total_container">
+  	<h2>회원가입 페이지입니다.</h2>
+  	<h2>담당사역 확인( {{ checkedDuty }} )</h2>
   <form role="form" id="signupForm" @submit.prevent='goSignup'>
     <div class="form-group">
-        <label for="name" class="control-label">이름</label>
-        <input type="text" class="form-control" id="name" v-model="ssm_name">
+    	<label for="name" class="control-label">이름</label>
+    	<input type="text" class="form-control textbox" id="name" v-model="ssm_name">
+    </div>
+		<div class="form-group">
+      <label for="id" class="control-label" id="class">아이디</label>
+			<input type="text" style="ime-mode:inactive;" class="form-control" id="id" v-model="ssm_id" @keyup="checkId">
+			
+      <label class="control-label-sub">{{ idLog }}</label>
+      <input type="hidden" :value="idIsChecked">
     </div>
     <div class="form-group">
-        <label for="id">아이디</label>
-        <input type="text" class="form-control" id="id" v-model="ssm_id">
-        <input type="button" value="아이디 중복체크" @click="checkId">
-        {{ idLog }}
-        <input type="hidden" :value="idIsChecked">
-    </div>
-    <div class="form-group">
-        <label for="pw">비밀번호</label>
+        <label for="pw" class="control-label">비밀번호</label>
         <input type="password" id="pw" class="form-control" v-model="ssm_pw">
     </div>
     <div class="form-group">
-        <label for="phone">전화번호</label>
+        <label for="phone" class="control-label">전화번호</label>
         <input type="text" id="phone" class="form-control" v-model="ssm_phone">
     </div>
     <div class="form-group">
-        <label for="team">팀 번호</label>
+        <label for="team" class="control-label">팀 번호</label>
         <input type="text" id="team" class="form-control" v-model="ssm_team">
     </div>
     <div class="form-group">
-        <label>사역자 기수 확인 ( {{ ssm_gen }} )</label>
+        <label class="control-label">사역자 기수 확인 ( {{ ssm_gen }} )</label>
         <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" id="gen1" value="1" v-model="ssm_gen">
             <label class="form-check-label" for="gen1">1기</label>
@@ -38,7 +39,7 @@
         </div>
     </div>
     <div class="form-group">
-        <label>담당 사역 ( {{ checkedDuty }} )</label>
+        <label class="control-label">담당 사역 ( {{ checkedDuty }} )</label>
         <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" id="intern" value="I" v-model="checkedDuty">
             <label class="form-check-label" for="intern">훈련생</label>
@@ -49,16 +50,24 @@
         </div>
         <div class="form-check form-check-inline">
             <input class="form-check-input" type="radio" id="pastor" value="M" v-model="checkedDuty">
-            <label class="form-check-label" for="pastor">훈련생</label>
+            <label class="form-check-label" for="pastor">교역자</label>
         </div>
     </div>
         
     
-      <input type="button" value="뒤로" @click="goBack">
-      <input type="submit" value="회원가입">
+      <input class="btn btn-primary" type="button" value="뒤로" @click="goBack">
+      <input class="btn btn-primary"type="submit" value="회원가입">
     </form>
     </div>
+    </div>
+
 </template>
+<style scoped>
+        .row {
+            background-image: url('../assets/flower_pattern.jpg');
+            z-index: 1;
+        }
+    </style>
 
 <script>
 export default {
@@ -99,19 +108,24 @@ export default {
         }
     },
     checkId(){
-        this.$http.post('api/sasamo/checkid', {
-            id : this.ssm_id
+				if(this.ssm_id.length < 3){
+					this.idLog = "아이디는 6자 이상 입력해주세요."
+				} else {
+					
+					this.$http.post('api/sasamo/checkid', {
+						id : this.ssm_id
         }).then(res => {
-            console.log('checkID :',res)
+					console.log('checkID :',res)
             if(res.data.data){
-                this.idIsChecked = 'y'
+							this.idIsChecked = 'y'
                 this.idLog = "사용가능한 아이디입니다"
             } else {
-                this.idIsChecked = 'n'
+							this.idIsChecked = 'n'
                 this.idLog = "이미 사용중인 아이디입니다"
             }
         })
 
+				}
     },
     goBack() {
       this.$router.push({ name: 'sasamo'})

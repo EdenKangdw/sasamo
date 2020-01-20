@@ -1,14 +1,13 @@
 <template lang="html">
-<div id="app">
+<div class="row">
+    <div class="total_container">
     <h2> {{ greeting }} </h2>
+    <br>
     <form id="teamForm" @submit.prevent='arrange' action="/team">
-        <table id="myteam" border="1px soild black" style="margin-left: auto; margin-right: auto;">
+        <table class="table" id="myteam" style="margin-left: auto; margin-right: auto;">
             <tr>
                 <th>이름</th>
-                <th>소속팀</th>
-                <th>현재 배정그룹</th>
-                <th>멤버유형</th>
-                <th>배정할 그룹</th>
+                <th>역할</th>
             </tr>
             <tr v-for="(item, idx) in team" :key="item.ssm_id">
                 <td>{{ item.ssm_name }}</td>
@@ -38,14 +37,21 @@
         </table>
     </form>
 </div>
+</div>
 
         
 </template>
-<style>
+<style scoped>
 #login{
     text-align : center;
     margin-left: auto; 
     margin-right: auto;
+}
+
+.row {
+    background-image: url('../assets/flower_pattern.jpg');
+    z-index: 1;
+    height: 100vh;
 }
 
 </style>
@@ -61,6 +67,7 @@ export default {
         "access-token" : token
       }
     }
+    console.log(this.user_info)
 
     this.$http.get('/api/sasamo/team/list', config)
         .then((result) => {
@@ -110,7 +117,7 @@ export default {
 
     initialData(){
      return {
-      greeting : "아래는 사역을 신청한 사역자의 명단입니다. 팀을 배정해주세요",
+      greeting : "오늘의 팀",
       team: [],
       editTeam: [],
       teamList: [],

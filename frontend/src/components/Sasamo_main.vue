@@ -11,7 +11,7 @@
     	<div class="col-md-4"></div>
 		
 		<!--Greed 1 end-->
-
+<br>
 		<!--Greed 2 start-->
 		<div class="col-md-4"></div>
 		<div class="col-md-4 content-wrapper">
@@ -28,7 +28,7 @@
   	<div class="col-md-4 btn_wrapper"> 
     	<div class="btn_item"><input class="btn btn-primary" type="button" :value="btn_apply ? '사역신청 취소' : '사역신청'" @click="btnApply"></div>
      	<div class="btn_item"><input v-if="btn_apply" class="btn btn-primary" type="button" :value="btn_check ? '출석취소' : '출석체크'" @click="btnCheck"></div>
-     	<div class="btn_item"><input class="btn btn-primary" type="button" :value="btn_team ? '팀 배정하기' : '팀 확인하기'" @click="myTeam"></div>
+     	<div class="btn_item"><input class="btn btn-primary" type="button" :value="btn_team ? '팀 배정하기' : '팀 정보보기'" @click="myTeam"></div>
 			<img class="btn-back" src="../assets/icons8-back-arrow-64.png" @click="goBack">
      	<!-- <div class="btn_item"><input class="btn-back" type="button" value="←" @click="goBack"></div> -->
    	</div>
@@ -44,6 +44,7 @@
 	.row {
 		background-image: url('../assets/flower_pattern.jpg');
 		z-index: 1;
+    height: 100vh;
 	}
 </style>
 
@@ -61,7 +62,7 @@ export default {
     }
 
     // 유저정보 api 요청 : 오늘에 대해 출석체크를 했는지 값도 리턴됨
-    this.$http.get('/api/sasamo//user/info', config)
+    this.$http.get('/api/sasamo/user/info', config)
       .then((res) => {
         console.log('RESULT : ', res.data)
         // 로그인이 완료되면 오늘 이벤트에 사역신청 했는지 확인 
@@ -71,7 +72,7 @@ export default {
           console.log("isToday? :", this.user.isTodayApply)
           // 로그인 성공 
           this.$store.commit("updateEvent", this.user.eventSeq) 
-          if(this.user.leader === 'y'){
+          if(this.user.leader != ''){
             // 팀장인 경우 
             this.loginLeader(this.user.isTodayApply, this.user.isTodayCheck)
             console.log('a',this.btn_apply)
@@ -186,7 +187,7 @@ export default {
     })
       .then((res) => {
         console.log('show', res)
-        alert('출석체크 완료!')
+        // alert('출석체크 완료!')
       }) 
   },
     cancel(){
@@ -200,11 +201,15 @@ export default {
       })
        .then((res) => {
         console.log('사역신청 취소 완료')
-        alert('사역신청 취소 완료!')
+        // alert('사역신청 취소 완료!')
       })
     },
     myTeam() {
-      this.$router.push({ name: 'sasamo_myteam' })
+      if(this.user.leader != ''){
+        this.$router.push({ name: 'sasamo_myteam_leader' })
+      }else {
+        this.$router.push({ name: 'sasamo_myteam_user' })
+      }
     },
     goBack() {
       this.$router.push({ name: 'sasamo'})

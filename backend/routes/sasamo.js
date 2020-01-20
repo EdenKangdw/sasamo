@@ -64,25 +64,44 @@ function teamModel(count, group) {
 	};
 }
 
+
+
+
 // 회원의 상태값 가져오는 함수 
 function statusModel(todayModel) {
-	var query = 
-	`select * from ssm_check where ssm_seq=${todayModel.ssm_seq} 
-																and evt_seq=${todayModel.evt_seq}`
+	var query =
+		`select * from ssm_check where ssm_seq=${todayModel.ssm_seq} and evt_seq=${todayModel.evt_seq}`
 	return new Promise((resolve, reject) => {
 		connection.query(query, function (err, result) {
 			if (err) {
 				console.log('statusModel Error: ', err)
 				reject(err)
 				throw err
-			} else {
+			} else if (result != "") {
+				// 데이터가 있을 때, 
 				let data = result
 				console.log('Status :', data)
 				resolve(data)
+			} else {
+				// 체크 데이터가 없을때 
+				const userQuery = `select * from ssm_member where ssm_seq='${todayModel.ssm_seq}'`
+				connection.query(userQuery, (err2, result2) => {
+					if (err2) {
+						console.log("err2 :", err2)
+						reject(err2)
+					} else {
+						let data2 = result2
+						console.log('Status2 :', data2)
+						resolve(data2)
+					}
+
+				})
+
 			}
 		})
 	})
 }
+
 
 
 // router
@@ -171,6 +190,8 @@ router.get('/user/info', (req, res) => {
 					.catch((err) => {
 						console.log('ERROR: ', err)
 					})
+			}).catch((err) => {
+				console.log('Error :', err)
 			})
 	} else {
 		alert("시간이 만료되어 로그인이 해제되었습니다. 다시 로그인해주세요.")
@@ -351,8 +372,8 @@ router.post('/check', function (req, res) {
 				switch (checkModel.isTodayApplied) {
 					case 'y':
 						// 출석체크 update
-						let checkQuery = `update ssm_check set chk_isCheck = 'y' where ssm_seq = '${ssm_seq}' `
-						checkQuery += `and evt_seq = ${evt_seq} and ssm_team = ${ssm_team} and updt = now()`
+						let checkQuery = `update ssm_check set chk_isCheck = 'y', updt = now() where ssm_seq = '${ssm_seq}' `
+						checkQuery += `and evt_seq = ${evt_seq} and ssm_team = ${ssm_team}`
 						console.log('출석체크 1 : ', checkQuery)
 						connection.query(checkQuery, function (err) {
 							var data = resModel()
@@ -371,8 +392,8 @@ router.post('/check', function (req, res) {
 
 					case 'n':
 						// 재사역신청 update
-						let applyQuery = `update ssm_check set chk_isApply = 'y' where ssm_seq = '${ssm_seq}' `
-						applyQuery += `and evt_seq = ${evt_seq} and ssm_team = ${ssm_team} updt = now()`
+						let applyQuery = `update ssm_check set chk_isApply = 'y', updt = now() where ssm_seq = '${ssm_seq}' `
+						applyQuery += `and evt_seq = ${evt_seq} and ssm_team = ${ssm_team}`
 						console.log('재사역신청 1 : ', applyQuery)
 						connection.query(applyQuery, function (err) {
 							var data = resModel()
@@ -437,7 +458,7 @@ router.post('/cancelCheck', function (req, res) {
 				switch (checkModel.isTodayChecked) {
 					case 'y':
 						// 출석취소 update
-						let checkQuery = `update ssm_check set chk_isCheck = 'n' where ssm_seq = '${ssm_seq}' `
+						let checkQuery = `update ssm_check set chk_isCheck = 'n', updt = now() where ssm_seq = '${ssm_seq}' `
 						checkQuery += `and evt_seq = ${evt_seq} and ssm_team = ${ssm_team}`
 						console.log('출석취소 1 : ', checkQuery)
 						connection.query(checkQuery, function (err) {
@@ -457,7 +478,7 @@ router.post('/cancelCheck', function (req, res) {
 
 					case 'n':
 						// 사역취소 update
-						let applyQuery = `update ssm_check set chk_isApply = 'n' where ssm_seq = '${ssm_seq}' `
+						let applyQuery = `update ssm_check set chk_isApply = 'n', updt = now() where ssm_seq = '${ssm_seq}' `
 						applyQuery += `and evt_seq = ${evt_seq} and ssm_team = ${ssm_team}`
 						console.log('재사역신청 1 : ', applyQuery)
 						connection.query(applyQuery, function (err) {
@@ -547,6 +568,7 @@ router.post('/signup', function (req, res) {
 
 });
 
+
 // 팀배정용_배정 가능 팀 목록 조회
 router.get('/team/list', (req, res) => {
 	let token = req.headers['access-token'] || req.query.token
@@ -633,7 +655,7 @@ router.post('/team/arrange', function (req, res) {
 		console.log('eventCode', evt_seq)
 		console.log('EDIT TEAM :', editTeam[0].ssm_group)
 		for (var i = 0; i < editTeam.length; i++) {
-			const updateQuery = `update ssm_check set ssm_group ='${editTeam[i].ssm_group}' where ssm_seq='${editTeam[i].id}' and evt_seq ='${evt_seq}'`
+			const updateQuery = `update ssm_check set ssm_group ='${editTeam[i].ssm_group}', updt = now() where ssm_seq='${editTeam[i].id}' and evt_seq ='${evt_seq}'`
 			connection.query(updateQuery, (err, result) => {
 				console.log('EDIT TEAM')
 				if (err) {

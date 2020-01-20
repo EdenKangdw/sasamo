@@ -1,8 +1,8 @@
 <template lang="html">
 <div class="row">
 	<div class="total_container">
-  	<h2>회원가입 페이지입니다.</h2>
-  	<h2>담당사역 확인( {{ checkedDuty }} )</h2>
+  	<h2 style="margin-bottom:5%;">회원가입.</h2>
+  	<!-- <h2>담당사역 확인( {{ checkedDuty }} )</h2> -->
   <form role="form" id="signupForm" @submit.prevent='goSignup'>
     <div class="form-group">
     	<label for="name" class="control-label">이름</label>

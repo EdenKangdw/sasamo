@@ -7,12 +7,12 @@ module.exports = (function () {
         password: '1111',
         database: 'sasamo'
       },
-      real: { // real server db info
-        host: '',
-        port: '',
-        user: '',
-        password: '!',
-        database: ''
+      heroku: { // real server db info
+        host: 'if0ck476y7axojpg.cbetxkdyhwsb.us-east-1.rds.amazonaws.com',
+        port: '3306',
+        user: 'hrttsqf24b6bas1o',
+        password: 'ope0pbfbnv7kz7lk',
+        database: 'tzre4ghk21h8egjz'
       },
       dev: { // dev server db info
         host: '',

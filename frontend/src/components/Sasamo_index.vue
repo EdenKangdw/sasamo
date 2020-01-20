@@ -1,5 +1,5 @@
 <template lang="html">
-<div id="app" class="container">
+<div id="app" class="total_container">
     
     <div class="row">
         <div class="col-md-4"></div>
@@ -12,7 +12,7 @@
 
 
 
-    
+    <br>
     <form id="loginForm" @submit.prevent='login' action="/login">
         <table id="login">
             <tr>
@@ -38,7 +38,7 @@
 </div>
         
 </template>
-<style>
+<style scoped>
 #login{
     text-align : center;
     margin-left: auto; 
@@ -48,6 +48,8 @@
 #wrapper_btn{
     margin-top: 10%;
 }
+
+
 </style>
 
 <script>

@@ -6,6 +6,12 @@ var secretObj = require('../config/jwt')
 var mysql_dbc = require('../model/db/db_conn')();
 var connection = mysql_dbc.init();
 
+router.get('/', function (req, res, next) {
+	console.log('work');
+	res.sendFile(path.join(__dirname, '../public', 'index.html'))
+	console.log("1e232323");
+  });
+
 // model 
 
 function resModel() {
@@ -24,6 +30,7 @@ function userModel(userVal, checkStatus, Boolean) {
 			ssm_seq: userVal.ssm_seq ? userVal.ssm_seq : "fail",
 			ssm_group: userVal.ssm_group ? userVal.ssm_group : '0',
 			ssm_name: userVal.ssm_name ? userVal.ssm_name : 'none',
+			grp_seq : userVal.grp_seq ? userVal.grp_seq : '0',
 			isTodayApply: checkStatus.chk_isApply ? checkStatus.chk_isApply : 'none',
 			isTodayCheck: checkStatus.chk_isCheck ? checkStatus.chk_isCheck : 'none',
 			leader: userVal.ssm_tmldr ? userVal.ssm_tmldr : "n",
@@ -111,10 +118,10 @@ function statusModel(todayModel) {
 router.post('/login', function (req, res) {
 	var id = req.body.id
 	var pw = req.body.pw
-	var stmt = `select * from ssm_member where ssm_id='${id}'`;
+	var query = `select * from ssm_member where ssm_id='${id}'`;
 	console.log(`login ${id} and ${pw}`)
 	console.log(typeof id)
-	connection.query(stmt, function (err, result) {
+	connection.query(query, function (err, result) {
 		if (err) {
 			console.log(err)
 			throw err;
@@ -153,7 +160,7 @@ router.get('/user/info', (req, res) => {
 				statusModel(todayModel)
 					.then((checkStatus) => {
 						console.log('this is status:', checkStatus[0].chk_isApply)
-						switch (checkStatus[0].chk_isApply) {
+						switch (checkStatus[0].cxhk_isApply) {
 							case 'y':
 								// 사역 신청을 한 경우
 								userModel(decoded.data, checkStatus[0], true)
@@ -570,7 +577,7 @@ router.post('/signup', function (req, res) {
 
 
 // 팀배정용_배정 가능 팀 목록 조회
-router.get('/team/list', (req, res) => {
+router.get('/team/list/leader', (req, res) => {
 	let token = req.headers['access-token'] || req.query.token
 	let decoded = jwt.decode(token, secretObj.secret)
 
@@ -606,8 +613,47 @@ router.get('/team/list', (req, res) => {
 	}
 }),
 
+// 유저용_팀리스트 조회
+router.get('/team/list', (req, res) => {
+	let token = req.headers['access-token'] || req.query.token
+	let decoded = jwt.decode(token, secretObj.secret)
+
+	if(decoded) {
+		let grp_seq = decoded.data.grp_seq
+		console.log(';lllllllll')
+		const query = `select ssm_seq ,ssm_name, ssm_grptype from ssm_member where grp_seq = '${grp_seq}'`
+
+		connection.query(query, async (err, result) => {
+			let data = resModel()
+			if (err) {
+				console.log(err)
+				data.success = false
+				data.error = err
+				throw err
+			} else {
+				data.success = true
+				console.log('teamDATA :', result)
+				let teamData = await result.sort(teamOrder)
+				console.log(teamData, "datateam")
+				data.data = teamData
+				res.send(data)
+			}
+		})
+	}
+})
+
+const teamOrder = (a,b) => {
+	// data에 null이 있으면 sort 작동안함
+	console.log(a.ssm_grptype, "type")
+	return a.ssm_grptype < b.ssm_grptype ? -1 : a.ssm_grptype > b.ssm_grptype ? 1 : 0
+	
+
+}
+
+
+
 	// 팀배정용_사역신청자 리스트 조회
-	router.get('/team/applied', async (req, res) => {
+	router.get('/team/applied', (req, res) => {
 		let token = req.headers['access-token'] || req.query.token
 		let decoded = jwt.decode(token, secretObj.secret)
 

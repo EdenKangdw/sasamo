@@ -17,7 +17,7 @@
 		<div class="col-md-4 content-wrapper">
   		<div>
     		<h2><span class="user_info" id="tm_info">{{ user.ssm_name }}</span>님</h2>
-    		<h2><span class="user_info"id="tm_info">{{ user.ssm_group }}팀</span>입니다</h2> 
+    		<h2><span class="user_info"id="tm_info">{{ user.grp_seq }}팀</span>입니다</h2> 
   		</div>
 		</div>
 	  <div class="col-md-4"></div>
@@ -28,7 +28,8 @@
   	<div class="col-md-4 btn_wrapper"> 
     	<div class="btn_item"><input class="btn btn-primary" type="button" :value="btn_apply ? '사역신청 취소' : '사역신청'" @click="btnApply"></div>
      	<div class="btn_item"><input v-if="btn_apply" class="btn btn-primary" type="button" :value="btn_check ? '출석취소' : '출석체크'" @click="btnCheck"></div>
-     	<div class="btn_item"><input class="btn btn-primary" type="button" :value="btn_team ? '팀 배정하기' : '팀 정보보기'" @click="myTeam"></div>
+     	<div class="btn_item"><input class="btn btn-primary" type="button" :value="'팀 정보보기'" @click="myTeamUser"></div>
+     	<div class="btn_item"><input v-if="btn_team" class="btn btn-primary" type="button" :value="'팀 배정하기'" @click="myTeamLeader"></div>
 			<img class="btn-back" src="../assets/icons8-back-arrow-64.png" @click="goBack">
      	<!-- <div class="btn_item"><input class="btn-back" type="button" value="←" @click="goBack"></div> -->
    	</div>
@@ -72,7 +73,7 @@ export default {
           console.log("isToday? :", this.user.isTodayApply)
           // 로그인 성공 
           this.$store.commit("updateEvent", this.user.eventSeq) 
-          if(this.user.leader != ''){
+          if(this.user.leader != 'n'){
             // 팀장인 경우 
             this.loginLeader(this.user.isTodayApply, this.user.isTodayCheck)
             console.log('a',this.btn_apply)
@@ -204,12 +205,14 @@ export default {
         // alert('사역신청 취소 완료!')
       })
     },
-    myTeam() {
-      if(this.user.leader != ''){
+    myTeamLeader() {
+      console.log(this.user.leader, "sijdfilsf")
+    
         this.$router.push({ name: 'sasamo_myteam_leader' })
-      }else {
+      
+    },
+    myTeamUser() {
         this.$router.push({ name: 'sasamo_myteam_user' })
-      }
     },
     goBack() {
       this.$router.push({ name: 'sasamo'})

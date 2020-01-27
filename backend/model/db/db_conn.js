@@ -1,6 +1,6 @@
 var mysql = require('mysql');
-var config = require('../db/db_info').local;
-// local, heroku를 통해 연결 DB 주소 변경가능
+var config = require('../db/db_info').heroku;
+// .local, .heroku를 통해 연결 DB 주소 변경가능
 
 module.exports = function () {
   return {

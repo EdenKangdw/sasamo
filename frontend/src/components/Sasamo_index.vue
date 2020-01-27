@@ -75,13 +75,13 @@ export default {
             pw: this.ssm_pw
         }).then((res) => {
           	this.token = res.data
-            console.log("TOKEN :", res.data)
-            if(res.data){
+            console.log("TOKEN :", res.data, typeof res.data)
+            if(res.data != 'fail'){
               this.$store.commit("updateToken", res.data)
               this.$router.push({ name: 'sasamo_main' })
             }else{
-              console.log("kashfdkasdkfl")
-              this.log = "올바르지 않은 아이디/패스워드 입니다"
+              console.log("로그인 실패 : 아이디, 패스워드 오류")
+              alert("올바른 아이디와 비밀번호를 입력해주세요.")
             }
         	})
         }

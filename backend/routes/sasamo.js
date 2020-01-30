@@ -74,6 +74,8 @@ function teamModel(count, group) {
 
 
 
+
+
 // 회원의 상태값 가져오는 함수 
 function statusModel(todayModel) {
 	var query =

@@ -13,14 +13,7 @@ router.get('/', function (req, res, next) {
 });
 // __dirname = 디렉토리의 절대경로
 
-router.get('/member', function(req, res) {
-  console.log("logn");
- const query = 'select * from ssm_member';
- connection.query(query, function(err, result) {
-   console.log(result);
-   res.send(result)
- })
-});
+
 
 router.get('/mysql/test', function (req, res) {
   var stmt = 'select * from ssm_member';

@@ -143,6 +143,10 @@ router.post('/login', function (req, res) {
 					res.send("fail")
 				}
 			}
+			else {
+				// 로그인 정보가 달라 실패한 경우
+				res.send("fail")
+			}
 		}
 	})
 })

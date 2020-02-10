@@ -80,7 +80,7 @@ export default {
               this.$store.commit("updateToken", res.data)
               this.$router.push({ name: 'sasamo_main' })
             }else{
-              console.log("로그인 실패 : 아이디, 패스워드 오류")
+              console.log(res.data, '로그인 실패 아이디, 패스워드 오류')
               alert("올바른 아이디와 비밀번호를 입력해주세요.")
             }
         	})

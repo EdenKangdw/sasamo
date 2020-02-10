@@ -20,15 +20,17 @@ const loginModel = () => {
         data: String,
         access : Boolean
 	}
-}
+} 
+
+const levelList = ['A', 'B', 'C', 'D']
 
 
 // 로그인 
-router.post('/login', function (req, res) {
+router.post('/user/login', function (req, res) {
     var id = req.body.id
     var pw = req.body.pw
     var query = `select * from ssm_member where ssm_id='${id}'`;
-    console.log(`login ${id} and ${pw}`)
+    console.log(`admin login ${id} and ${pw}`)
     console.log(typeof id)
     connection.query(query, function (err, result) {
         if (err) {
@@ -37,8 +39,8 @@ router.post('/login', function (req, res) {
         } else {
             console.log(typeof result, result.length, result)
             console.log('user DATA: ', result[0])
+            let data = loginModel()
             if (result[0]) {
-                let data = loginModel()
                 if (id === result[0].ssm_id && pw === result[0].ssm_pw) {
                     if (result[0].ssm_level != "E") {
                         // 정상적으로 로그인하는 경우
@@ -70,15 +72,74 @@ router.post('/login', function (req, res) {
     })
 })
 
+const compareLevel = (level) => {
+    return levelList.indexOf(level)
+
+}
+
+// 사역자 등급 변경 
+router.post('/auth/class', (req, res) => {
+    let token = req.headers['access-token'] || req.query.token
+    let decoded = jwt.decode(token, secretObj.secret)
+    
+
+    if(decoded != null ){
+        const {ssm_level, ssm_grptype, ssm_seq} = req.body
+        const query = `update ssm_member set ssm_level = ${ssm_level}, ssm_grptype = ${ssm_grptype} where ssm_seq = ${ssm_seq}`
+        let data = resModel()
+
+        connection.query(query, (err, result) => {
+            if(err) {
+                console.log(err)
+                data.success = false
+                data.error = err
+                res.send(data)
+                throw err
+            } else {
+                data.success = true
+                res.send(data)
+            }
+        })
+    }
+})
+
+
+
+// 사역자 팀 변경 
+router.post('/team/arrange', async (req, res) => {
+    let token = req.headers['access-token'] || req.query.token
+    let decoded = jwt.decode(token, secretObj.secret)
+    const isAdmin = await compareLevel(decoded.ssm_level)
+    
+    if(isAdmin !== -1){
+        const {ssm_level, ssm_grptype, ssm_seq} = req.body
+        const query = `update ssm_member set ssm_level = ${ssm_level}, ssm_grptype = ${ssm_grptype} where ssm_seq = ${ssm_seq}`
+        let data = resModel()
+
+        connection.query(query, (err, result) => {
+            if(err) {
+                console.log(err)
+                data.success = false
+                data.error = err
+                res.send(data)
+                throw err
+            } else {
+                data.success = true
+                res.send(data)
+            }
+        })
+    }
+})
+
 // 사역자 관리 메인 리스트 
-router.get('/member', (req, res) => {
+router.get('/user/list', (req, res) => {
     let token = req.headers['access-token'] || req.query.token
     let decoded = jwt.decode(token, secretObj.secret)
 
     console.log("request Token :", token)
     console.log("DECODED INFO", decoded)
     if (decoded) {
-        const query = `select a.ssm_seq, a.ssm_name, a.ssm_team, a.grp_seq, b.chk_isApply, b.chk_isCheck 
+        const query = `select a.ssm_seq, a.ssm_name, a.ssm_team, a.grp_seq, a.ssm_phone, b.chk_isApply, b.chk_isCheck 
                         from (select * from ssm_member) a, ssm_check b
                         where a.ssm_seq = b.ssm_seq;`
         connection.query(query, (err, result) => {

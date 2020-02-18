@@ -131,6 +131,71 @@ router.post('/team/arrange', async (req, res) => {
     }
 })
 
+const updateUser = (ssm_seq, ssm_name, ssm_team, grp_seq) => {
+    const query = ` update ssm_member set ssm_name = '${ssm_name}', ssm_team=${ssm_team}, grp_seq=${grp_seq}
+                    where ssm_seq=${ssm_seq}`
+    connection.query(query, (err, result) => {
+        if(err){
+            console.log(err)
+            throw err
+        } else {
+            console.log("ADMIN USER DATA UPDATE :", result )
+            return true
+        }
+    })
+
+}
+
+const updateUserCheck = (ssm_seq,chk_isApply, chk_isCheck) => {
+    const query = ` update ssm_check set chk_isApply = '${chk_isApply}', chk_isCheck='${chk_isCheck}'
+                    where ssm_seq=${ssm_seq}`
+    connection.query(query, (err, result) => {
+        if(err){
+            console.log(err)
+            throw err
+        } else {
+            console.log("ADMIN USER CHECK DATA UPDATE :", result)
+            return true
+        }
+    })
+
+}
+
+// 사역자 관리 - 데이터 변경 
+router.post('/user/update', async (req, res) => {
+    let token = req.headers['access-token'] || req.query.token
+    let decoded = jwt.decode(token, secretObj.secret)
+    const {ssm_seq, ssm_name, ssm_team, grp_seq, chk_isApply, chk_isCheck} = req.body
+    
+    if (decoded) {
+       const isUserUpdate =  await updateUser(ssm_seq, ssm_name, ssm_team, grp_seq)
+       const isUserCheckUpdate = await updateUserCheck(ssm_seq, chk_isApply, chk_isCheck)
+       let data = resModel()
+       if(isUserCheckUpdate && isUserUpdate) {
+            data.success = true
+            res.send(data)
+       } else if(!isUserCheckUpdate) {
+           data.success = false
+           data.error = 'wrong Check data'
+           res.send(data)
+       } else if (!isUserUpdate) {
+            data.success = false
+            data.error = 'wrong user data'
+            res.send(data)  
+       } else {
+           data.success = false
+           data.error = 'Both are Wrong data'
+       }
+       
+
+        
+       
+       
+
+    }
+
+})
+
 // 사역자 관리 메인 리스트 
 router.get('/user/list', (req, res) => {
     let token = req.headers['access-token'] || req.query.token

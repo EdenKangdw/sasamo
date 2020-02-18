@@ -94,7 +94,7 @@ export default {
             this.ssm_type = this.checkedDuty
             console.log('TYPE : ' ,this.ssm_type)
       
-            this.$http.post('/api/sasamo/signup', {
+            axios.post('/api/sasamo/signup', {
                 ssm_name : this.ssm_name,
                 ssm_id : this.ssm_id,
                 ssm_pw : this.ssm_pw,

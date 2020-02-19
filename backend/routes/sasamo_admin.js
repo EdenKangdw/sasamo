@@ -160,31 +160,44 @@ const updateUserCheck = (ssm_seq,chk_isApply, chk_isCheck) => {
     })
 
 }
+// 사역자 관리 - 체크 데이터 update
+router.post('/user/update/check', async (req, res) => {
+    let token = req.headers['access-token'] || req.query.token
+    let decoded = jwt.decode(token, secretObj.secret)
+    const {ssm_seq, chk_isApply, chk_isCheck} = req.body
 
-// 사역자 관리 - 데이터 변경 
+    if (decoded) {
+        const isUserCheckUpdate =  await updateUserCheck(ssm_seq, chk_isApply, chk_isCheck)
+        let data = resModel()
+        if(isUserCheckUpdate) {
+             data.success = true
+             res.send(data)
+        } else {
+             data.success = false
+             data.error = 'wrong user data'
+             res.send(data)  
+        }
+
+    } 
+})
+
+
+// 사역자 관리 - 유저 데이터 update
 router.post('/user/update', async (req, res) => {
     let token = req.headers['access-token'] || req.query.token
     let decoded = jwt.decode(token, secretObj.secret)
-    const {ssm_seq, ssm_name, ssm_team, grp_seq, chk_isApply, chk_isCheck} = req.body
+    const {ssm_seq, ssm_name, ssm_team, grp_seq} = req.body
     
     if (decoded) {
        const isUserUpdate =  await updateUser(ssm_seq, ssm_name, ssm_team, grp_seq)
-       const isUserCheckUpdate = await updateUserCheck(ssm_seq, chk_isApply, chk_isCheck)
        let data = resModel()
-       if(isUserCheckUpdate && isUserUpdate) {
+       if(isUserUpdate) {
             data.success = true
             res.send(data)
-       } else if(!isUserCheckUpdate) {
-           data.success = false
-           data.error = 'wrong Check data'
-           res.send(data)
-       } else if (!isUserUpdate) {
+       } else {
             data.success = false
             data.error = 'wrong user data'
             res.send(data)  
-       } else {
-           data.success = false
-           data.error = 'Both are Wrong data'
        }
        
 
@@ -194,6 +207,29 @@ router.post('/user/update', async (req, res) => {
 
     }
 
+})
+
+// 팀 관리 - 리스트 
+router.get('/team/list', (req, res) => {
+    let token = req.headers['access-token'] || req.query.token
+    let decoded = jwt.decode(token, secretObj.secret)
+
+    if (decoded) {
+        const query = ` select * from view_team_list;`
+        connection.query(query, (err, result) => {
+            if (err) {
+                console.log(err)
+                throw err
+            } else {
+                console.log("ADMIN TEAM DATA :", result.length)
+                res.send(result)
+            }
+        })
+
+    } else {
+        res.send("no token")
+
+    }
 })
 
 // 사역자 관리 메인 리스트 

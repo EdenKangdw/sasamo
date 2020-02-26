@@ -103,7 +103,7 @@ export default {
   },
   watch : {
     selected(new_evt_seq){
-      
+
       this.selected = new_evt_seq
       let token = localStorage.getItem('access_token')
       let config = {
@@ -249,7 +249,7 @@ export default {
     
     
     this.$http.post('/api/sasamo/check',  {
-      evt_seq : evt_seq
+      evt_seq : this.selected
 
     }, { headers: { 'access-token': token },  
     })
@@ -265,7 +265,7 @@ export default {
 
       this.$http.post('/api/sasamo/cancelCheck', {
         token: token,
-        evt_seq : evt_seq
+        evt_seq : this.selected
       })
        .then((res) => {
         console.log('사역신청 취소 완료')

@@ -23,6 +23,21 @@
 	  <div class="col-md-4"></div>
 
 		<!-- greed 2 end -->
+    <br>
+
+    <!--Greed 2 start-->
+		<div class="col-md-3"></div>
+		<div class="col-md-6 content-wrapper">
+  		<div>
+    		<select class="form-control event" v-model="selected">
+          <option v-for="event in events" v-bind:value="event.evt_seq">
+            {{ event.evt_name }}
+          </option>
+        </select>
+  		</div>
+		</div>
+	  <div class="col-md-3"></div>
+
 		<!--Greed 3 start-->
   	<div class="col-md-4"></div>
   	<div class="col-md-4 btn_wrapper"> 
@@ -52,6 +67,7 @@
 
 <script>
 export default {
+  
   created () { 
     // 로컬스토리지에 저장된 토큰 가져오기 : 새로고침해도 로그인 풀리지 않음
     let token = localStorage.getItem('access_token')
@@ -63,7 +79,40 @@ export default {
     }
 
     // 유저정보 api 요청 : 오늘에 대해 출석체크를 했는지 값도 리턴됨
-    this.$http.get('/api/sasamo/user/info', config)
+  this.$http.get('api/sasamo/event/today', config)
+    .then(res => {
+      console.log(res.data)
+      this.events = res.data.data
+      this.selected = res.data.data[0].evt_seq
+      console.log(this.selected)
+    })
+
+
+    
+  },
+  data () {
+    return {
+      user: {},
+      today: {},
+      events: {},
+      selected: '',
+      btn_apply: false,
+      btn_check: false,
+      btn_team: false,
+    }
+  },
+  watch : {
+    selected(new_evt_seq){
+      
+      this.selected = new_evt_seq
+      let token = localStorage.getItem('access_token')
+      let config = {
+      headers : {
+          "access-token" : token
+        }
+      }
+
+      this.$http.post('/api/sasamo/user/info', {evt_seq : this.selected}, config)
       .then((res) => {
         console.log('RESULT : ', res.data)
         // 로그인이 완료되면 오늘 이벤트에 사역신청 했는지 확인 
@@ -84,15 +133,33 @@ export default {
         }
       }
     })
-  },
-  data () {
-    return {
-      user: {},
-      today: {},
-      btn_apply: false,
-      btn_check: false,
-      btn_team: false,
+
+
+      // this.$http.post('/api/sasamo/event/today', {
+      //   evt_seq : new_evt_seq
+      // }, config)
+      // .then(res =>{
+      //   console.log('RESULT : ', res.data)
+      //   // 로그인이 완료되면 오늘 이벤트에 사역신청 했는지 확인 
+      //   this.user = res.data
+      //   console.log('유저', this.user)
+      //   if(this.user.ok){
+      //     console.log("isToday? :", this.user.isTodayApply)
+      //     // 로그인 성공 
+      //     this.$store.commit("updateEvent", this.user.eventSeq) 
+      //     if(this.user.leader != 'n'){
+      //       // 팀장인 경우 
+      //       this.loginLeader(this.user.isTodayApply, this.user.isTodayCheck)
+      //       console.log('a',this.btn_apply)
+      //   } else {
+      //     // 일반 사역자의 경우 
+      //       this.loginNormal(this.user.isTodayApply, this.user.isTodayCheck)
+      //       console.log('b',this.btn_apply)
+      //   }
+      // }
+      // })
     }
+
   },
   methods: {
     btnCheck() {

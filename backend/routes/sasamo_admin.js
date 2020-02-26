@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var jwt = require('jsonwebtoken')
 var secretObj = require('../config/jwt')
+const moment = require('moment')
 
 var mysql_dbc = require('../model/db/db_conn')();
 var connection = mysql_dbc.init();
@@ -258,6 +259,71 @@ router.get('/user/list', (req, res) => {
 
     }
 
+})
+
+router.post('/event', (req, res) => {
+    let token = req.headers['access-token'] || req.query.token
+    let decoded = jwt.decode(token, secretObj.secret)
+    let data = resModel()
+
+    if(decoded){
+        const {evt_name, evt_date, evt_kind, evt_today} = req.body
+        const query = `insert into ssm_event(evt_name, evt_date, evt_kind, evt_today) values('${evt_name}', ${evt_date}, ${evt_kind}, '${evt_today}')`
+
+        connection.query(query, (err, result) => {
+            if(err){
+                data.error = err
+                data.success = false
+                res.send(data)
+                throw err
+            } else {
+                data.success = true
+                data.data = 'Event Insert : Success'
+                res.send(data)
+            }
+        })
+    } else {
+        data.error = 'Vaild Token'
+        data.success = false
+        res.send(data)
+
+    }
+})
+
+// const convertedDatetime = (array) => {
+//     array.map((col) => {
+//         if( typeof col != null )
+//     })
+// }
+
+router.get('/event/list', async (req, res) => {
+    let token = req.headers['access-token'] || req.query.token
+    let decoded = jwt.decode(token, secretObj.secret)
+    let data = resModel()
+
+    if(decoded){
+        const query = `select * from ssm_event`
+        console.log('query :', query)
+
+        connection.query(query, (err, result) => {
+            if(err){
+                data.error = err
+                data.success = false
+                res.send(data)
+                throw err
+            } else {
+                data.success = true
+                data.data = result
+                console.log(result[0].evt_date, typeof result[0].evt_date)
+                res.send(data)
+            }
+        })
+    } else {
+        data.error = 'Vaild Token'
+        data.success = false
+        res.send(data)
+
+    }
 })
 
 module.exports = router;

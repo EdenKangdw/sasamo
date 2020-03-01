@@ -2,10 +2,11 @@ var express = require('express');
 var router = express.Router();
 var jwt = require('jsonwebtoken')
 var secretObj = require('../config/jwt')
-const moment = require('moment')
 
 var mysql_dbc = require('../model/db/db_conn')();
 var connection = mysql_dbc.init();
+
+const CODE_KEY = 'rkffk220'
 
 const resModel = () => {
 	return {
@@ -24,6 +25,38 @@ const loginModel = () => {
 } 
 
 const levelList = ['A', 'B', 'C', 'D']
+
+// QR스캔 데이터 + 유저 데이터 비교 
+
+router.post('/scan/user', (res, req) => {
+    const {id, key} = req.body 
+    let data = resModel()
+    if( CODE_KEY == key) {
+        const query = `select * from ssm_member where ssm_seq = ${id}`
+        connection.query(query, (err, result) => {
+            if(err){
+                data.success = false
+                data.error = err
+                console.log(err)
+                res.send(data)
+                throw err
+            } else {
+                console.log('DATA  : ', result[0])
+                data.success = true 
+                data.data = result[0]
+                res.send(data)
+
+            }
+        })
+
+    } else {
+        data.error = 'userDataNullException'
+        data.data = '교적부에 등록되어 있지 않습니다. 교번을 확인해주세요.'
+        res.send(data)
+
+
+    }
+})
 
 
 // 로그인 
@@ -104,68 +137,10 @@ router.post('/auth/class', (req, res) => {
     }
 })
 
-router.post('/team/arrange', (req, res) => {
-    let token = req.headers['access-token'] || req.query.token
-    let decoded = jwt.decode(token, secretObj.secret)
-    let data = resModel()    
-    const {ssm_seq, ssm_team} = req.body
-
-    if(decoded) {
-        const query = ` insert into ssm_member(ssm_seq,ssm_team) values(${ssm_seq}, ${ssm_team})
-                        on duplicate key update ssm_team = ${ssm_team};`
-        connection.query(query, (err, result) => {
-            if(err) {
-                data.error = err
-                data.success = false
-                res.send(data)
-                throw err
-            } else {
-                data.success = true
-                data.data = 'Arrange team success'
-                res.send(data)
-            }
-        })
-    } else {
-        data.error = 'Vaild Token'
-        data.success = false
-        res.send(data)
-    }
-    
-})
-
-// post api SAMPLE
-router.post('sample', (req, res) => {
-    let token = req.headers['access-token'] || req.query.token
-    let decoded = jwt.decode(token, secretObj.secret)
-    let data = resModel()    
-    const {ssm_seq, chk_isApply, chk_isCheck} = req.body
-
-    if(decoded) {
-        const query = ''
-        connection.query(query, (err, result) => {
-            if(err) {
-                data.error = err
-                data.success = false
-                res.send(data)
-                throw err
-            } else {
-                data.success = true
-                data.data = result
-                res.send(data)
-            }
-        })
-
-    } else {
-        data.error = 'Vaild Token'
-        data.success = false
-        res.send(data)
-    }
-    
-})
 
 
-// 사역자 조 변경 
-router.post('/team/change', async (req, res) => {
+// 사역자 팀 변경 
+router.post('/team/arrange', async (req, res) => {
     let token = req.headers['access-token'] || req.query.token
     let decoded = jwt.decode(token, secretObj.secret)
     const isAdmin = await compareLevel(decoded.ssm_level)
@@ -258,42 +233,29 @@ router.post('/user/update', async (req, res) => {
             data.error = 'wrong user data'
             res.send(data)  
        }
-     } else {
-        data.error = 'Vaild Token'
-        data.success = false
-        res.send(data)
-     }
-
-})
-// 팀 생성
-router.post('/team/create', (req, res) => {
-    let token = req.headers['access-token'] || req.query.token
-    let decoded = jwt.decode(token, secretObj.secret)
-    let data = resModel()
-    const {tm_number, tm_leader} = req.body
-
-    if(decoded) {
-        const query = ` insert into ssm_team(tm_leader, tm_number)
-                        values(${tm_leader}, ${tm_number})`
-        connection.query(query, (err, result) => {
-            if(err) {
-                data.error = err
-                data.success = false
-                console.error(err)
-                res.send(data)
-                throw err
-            } else {
-                data.success = true
-                data.data = 'insert team success'
-                res.send(data)
-            }
-        })
-    } else {
-        data.error = 'Vaild Token'
-        data.success = false
-        res.send(data)
     }
+
 })
+
+// code 
+
+router.post('/code/check', async (req, res) => {
+    
+    const {name, phone, Userkey} = req.body
+    const key = "qwerty"
+    
+    let data = resModel()
+    if (Userkey == key) {
+        data.success = true
+        data.data = {username: name, user_phone: phone}
+        res.send(data)
+    } else {
+        data.success = false
+        data.data = '일치하지 않습니다'
+    }
+
+})
+
 
 // 팀 관리 - 리스트 
 router.get('/team/list', (req, res) => {
@@ -317,6 +279,8 @@ router.get('/team/list', (req, res) => {
 
     }
 })
+
+
 
 // 사역자 관리 메인 리스트 
 router.get('/user/list', (req, res) => {
@@ -344,104 +308,6 @@ router.get('/user/list', (req, res) => {
 
     }
 
-})
-
-router.post('/event/leader', (req, res) => {
-    let token = req.headers['access-token'] || req.query.token
-    let decoded = jwt.decode(token, secretObj.secret)
-    let data = resModel()
-    const {ssm_name} = req.body
-    console.log(ssm_name)
-    
-    if(decoded) {
-        const query = `select ssm_seq, ssm_phone from ssm_member where ssm_name = '${ssm_name}'`
-        connection.query(query, (err, result) => {
-            if(err) {
-                console.log(err)
-                data.error = err 
-                data.success = false
-                res.send(data)
-            } else {
-                if(result[0] != undefined) {
-                    data.success = true
-                    data.data = result[0]
-                    console.log('1',result[0])
-                    res.send(data)
-                } else {
-                    data.success = false
-                    data.error = 'no data'
-                    console.log('2')
-                    res.send(data)
-                }
-            }
-        })
-    } else {
-        data.error = 'Vaild Token'
-        data.success = false
-        res.send(data)
-    }
-
-})
-
-router.post('/event/create', async (req, res) => {
-    let token = req.headers['access-token'] || req.query.token
-    let decoded = jwt.decode(token, secretObj.secret)
-    let data = resModel()
-    const {evt_name, evt_date, evt_kind, evt_today} = req.body
-    console.log('DATe :', evt_date, typeof evt_date)
-    
-    
-    if(decoded) {
-        const query = ` insert into ssm_event(evt_name, evt_date, evt_kind, evt_today)
-                        values('${evt_name}', STR_TO_DATE('${evt_date}', '%Y-%m-%d'), ${evt_kind}, '${evt_today}' )`
-        connection.query(query, (err, result) => {
-            if(err) {
-                data.error = err
-                data.success = false
-                console.error(err)
-                res.send(data)
-                throw err
-            } else {
-                data.success = true
-                data.data = 'insert event success'
-                res.send(data)
-            }
-        })
-    } else {
-        data.error = 'Vaild Token'
-        data.success = false
-        res.send(data)
-    }
-})
-
-router.get('/event/list', async (req, res) => {
-    let token = req.headers['access-token'] || req.query.token
-    let decoded = jwt.decode(token, secretObj.secret)
-    let data = resModel()
-
-    if(decoded){
-        const query = `select * from ssm_event`
-        console.log('query :', query)
-
-        connection.query(query, (err, result) => {
-            if(err){
-                data.error = err
-                data.success = false
-                res.send(data)
-                throw err
-            } else {
-                data.success = true
-                data.data = result
-                console.log(result[0].evt_date, typeof result[0].evt_date)
-                res.send(data)
-            }
-        })
-    } else {
-        data.error = 'Vaild Token'
-        data.success = false
-        res.send(data)
-
-    }
 })
 
 module.exports = router;

@@ -8,9 +8,9 @@
             <tr>
                 <th>이름</th>
                 <th>역할</th>
-                
             </tr>
-            <tr v-for="(item, idx) in team" :key="item.ssm_id">
+            <h2 v-if="team == ''">아직 팀 배정이 안되었습니다.</h2>
+            <tr v-else v-for="(item, idx) in team" :key="item.ssm_id">
          
                 <!-- <td class="team_type1" v-if="item.ssm_grptype == '조장'">{{ item.ssm_name }}</span></td>
                 <td class="team_type1"v-if="item.ssm_grptype == '조장'">{{ item.ssm_grptype }}</span></td>
@@ -44,7 +44,6 @@
             <tr>
                 <td colspan="5">
                     <input class="btn btn-primary" type="button" value="뒤로" @click="goBack">
-                    <input class="btn btn-primary" type="button" value="팀 배정하기" @click="goArrange">
                 </td>
             </tr>
         </table>

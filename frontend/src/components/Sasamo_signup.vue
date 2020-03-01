@@ -1,7 +1,7 @@
 <template lang="html">
 <div class="row">
 	<div class="total_container">
-  	<h2 style="margin-bottom:5%;">회원가입.</h2>
+  	<h2 style="margin-bottom:5%;">회원가입</h2>
   	<!-- <h2>담당사역 확인( {{ checkedDuty }} )</h2> -->
   <form role="form" id="signupForm" @submit.prevent='goSignup'>
     <div class="form-group">
@@ -94,7 +94,7 @@ export default {
             this.ssm_type = this.checkedDuty
             console.log('TYPE : ' ,this.ssm_type)
       
-            axios.post('/api/sasamo/signup', {
+            this.$http.post('/api/sasamo/signup', {
                 ssm_name : this.ssm_name,
                 ssm_id : this.ssm_id,
                 ssm_pw : this.ssm_pw,

@@ -29,7 +29,7 @@
 		<div class="col-md-3"></div>
 		<div class="col-md-6 content-wrapper">
   		<div>
-    		<select class="form-control event" v-model="selected">
+    		<select id="selectEvent" class="form-control" v-model="selected">
           <option v-for="event in events" v-bind:value="event.evt_seq">
             {{ event.evt_name }}
           </option>
@@ -62,6 +62,10 @@
 		z-index: 1;
     height: 100vh;
 	}
+
+  #selectEvent {
+    width: 100%;
+  }
 </style>
 
 
@@ -135,30 +139,6 @@ export default {
     })
 
 
-      // this.$http.post('/api/sasamo/event/today', {
-      //   evt_seq : new_evt_seq
-      // }, config)
-      // .then(res =>{
-      //   console.log('RESULT : ', res.data)
-      //   // 로그인이 완료되면 오늘 이벤트에 사역신청 했는지 확인 
-      //   this.user = res.data
-      //   console.log('유저', this.user)
-      //   if(this.user.ok){
-      //     console.log("isToday? :", this.user.isTodayApply)
-      //     // 로그인 성공 
-      //     this.$store.commit("updateEvent", this.user.eventSeq) 
-      //     if(this.user.leader != 'n'){
-      //       // 팀장인 경우 
-      //       this.loginLeader(this.user.isTodayApply, this.user.isTodayCheck)
-      //       console.log('a',this.btn_apply)
-      //   } else {
-      //     // 일반 사역자의 경우 
-      //       this.loginNormal(this.user.isTodayApply, this.user.isTodayCheck)
-      //       console.log('b',this.btn_apply)
-      //   }
-      // }
-      // })
-    }
 
   },
   methods: {

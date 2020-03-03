@@ -104,31 +104,58 @@ router.post('/auth/class', (req, res) => {
     }
 })
 
-router.post('/team/arrange', (req, res) => {
+const arrangeTeam = (user, ssm_new_team) => {
+    console.log('@@@@@@@@@@@@@@@@@@@',user, ssm_new_team)
+    const {ssm_seq} = user
+    console.log('SEQQQQQQQQQQQQQQ',ssm_seq)
+    const query = ` insert into ssm_member(ssm_seq, ssm_team) values(${ssm_seq}, ${ssm_new_team})
+                    on duplicate key update ssm_team = ${ssm_new_team}`
+    let data = resModel()    
+    connection.query(query, (err, result) => {
+        if(err) {
+            data.error = err
+            data.success = false
+            console.log(err)
+            console.log("FAIL")
+            return false
+        } else {
+            data.success = true
+            data.data = 'Arrange team success'
+            console.log("Success")
+            console.log(data)
+            return data
+        }
+    })
+    
+
+
+}
+
+router.post('/team/arrange', async (req, res) => {
     let token = req.headers['access-token'] || req.query.token
     let decoded = jwt.decode(token, secretObj.secret)
-    let data = resModel()    
-    const {ssm_seq, ssm_team} = req.body
+    let data = resModel()
+
+    const {ssm_user, ssm_new_team} = req.body
+    console.log("arrange DATA : ", ssm_user.length, ssm_user)
+    
 
     if(decoded) {
-        const query = ` insert into ssm_member(ssm_seq,ssm_team) values(${ssm_seq}, ${ssm_team})
-                        on duplicate key update ssm_team = ${ssm_team};`
-        connection.query(query, (err, result) => {
-            if(err) {
-                data.error = err
-                data.success = false
-                res.send(data)
-                throw err
-            } else {
-                data.success = true
-                data.data = 'Arrange team success'
-                res.send(data)
-            }
-        })
-    } else {
-        data.error = 'Vaild Token'
-        data.success = false
+        let result = ''
+        for(let idx in ssm_user) {
+            console.log('FOR DATA : ', ssm_user[idx])
+            await arrangeTeam(ssm_user[idx], ssm_new_team)
+        }
+        
+        data.success = true
+        data.data = 'Arrange team success'
         res.send(data)
+
+    } else {
+        const errData = resModel()
+        errData.error = 'Vaild Token'
+        errData.success = false
+        res.send(errData)
     }
     
 })
